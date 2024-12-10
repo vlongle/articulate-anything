@@ -22,8 +22,7 @@ Articulate Anything is a powerful VLM system for articulating 3D objects using v
 
 
 
-
-https://github.com/user-attachments/assets/c5f005c8-6e57-43c6-93af-187e588e0537
+https://github.com/user-attachments/assets/3c23f423-3bdd-4843-a4e3-e1c7f26bfc42
 
 
 
