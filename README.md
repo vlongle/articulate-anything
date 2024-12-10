@@ -10,7 +10,7 @@
 [![Python Version](https://img.shields.io/badge/Python-3.9-blue.svg)](https://github.com/vlongle/articulate-anything)
 [![Framework](https://img.shields.io/badge/Framework-PyTorch-red.svg)](https://pytorch.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![arXiv](https://img.shields.io/badge/arXiv-2401.XXXXX-b31b1b.svg)](https://arxiv.org/abs/2401.XXXXX)
+[![arXiv](https://img.shields.io/badge/arXiv-2401.XXXXX-b31b1b.svg)](https://arxiv.org/abs/2410.13882)
 
 [[Project Website]](https://articulate-anything.github.io)
 [[Paper]](https://your-paper-link.com)
