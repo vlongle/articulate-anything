@@ -16,6 +16,5 @@ imgui.ini
 
 *.zip
 *.json
-*.csv
 *scans
 *.pkl
