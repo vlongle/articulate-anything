@@ -13,8 +13,8 @@
 [![arXiv](https://img.shields.io/badge/arXiv-2401.XXXXX-b31b1b.svg)](https://arxiv.org/abs/2410.13882)
 
 [[Project Website]](https://articulate-anything.github.io)
-[[Paper]](https://your-paper-link.com)
-[[Demo]](https://your-demo-link.com)
+[[Paper]](https://arxiv.org/abs/2410.13882)
+[[Twitter threads]](https://x.com/int64_le/status/1866519866934714623)
 
 ______________________________________________________________________
 
