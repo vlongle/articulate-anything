@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "/home/vlongle/code/articulate-anything/articulate_joint.py", line 269, in articulate_joint
+    run_gt_to_api(
+  File "/home/vlongle/code/articulate-anything/src/articulate_anything/prompts/prompt_utils.py", line 218, in run_gt_to_api
+    subprocess.run(command, check=True, env=env)
+  File "/mnt/kostas-graid/sw/envs/vlongle/miniconda3/envs/articulate-anything/lib/python3.9/subprocess.py", line 528, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['conda', 'run', '-n', 'articulate-anything', 'python', 'src/articulate_anything/gt_to_api.py', '--stationary_or_move', 'stationary', '--obj_id', '48167', '--function_file', '/mnt/kostas-graid/datasets/vlongle/articulate-anything/results/48167/joint_pred/joint_0/iter_1/seed_0/joint_pred.py', '--output_dir', '/mnt/kostas-graid/datasets/vlongle/articulate-anything/results/48167/joint_pred/joint_0/iter_1/seed_0', '--num_steps', '50', '--headless', '--joint_name', 'furniture_body_to_door', '--simulator', 'sapien', '--dataset_dir', '/mnt/kostas-graid/datasets/vlongle/articulate-anything/datasets/partnet-mobility-v0/dataset', '--aug_video', '--use_segmentation']' returned non-zero exit status 1.

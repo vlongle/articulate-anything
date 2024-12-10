@@ -1,0 +1,21 @@
+# Python egg metadata
+*.egg-info
+
+
+# Compiled Python files
+*.pyc
+__pycache__/
+
+
+**outputs
+**results**
+*partnet-mobility-v0*
+.env
+imgui.ini
+
+
+*.zip
+*.json
+*.csv
+*scans
+*.pkl

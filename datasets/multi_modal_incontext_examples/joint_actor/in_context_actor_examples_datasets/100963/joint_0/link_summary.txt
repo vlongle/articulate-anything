@@ -1,0 +1,7 @@
+object_id: 100963
+Robot Link Summary:
+ - base
+ - toggle_button
+ - toggle_button_2
+ - toggle_button_3
+ - switch_frame

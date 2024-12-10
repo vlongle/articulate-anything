@@ -1,0 +1,5 @@
+object_id: 12565
+Robot Link Summary:
+ - base
+ - dishwasher_body
+ - door

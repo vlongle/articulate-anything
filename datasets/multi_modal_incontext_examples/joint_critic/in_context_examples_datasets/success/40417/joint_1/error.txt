@@ -1,0 +1,19 @@
+Traceback (most recent call last):
+  File "/home/vlongle/code/auto-interable-scene/articulate_joint.py", line 307, in articulate_joint
+    joint_critic.generate_prediction(
+  File "/home/vlongle/code/auto-interable-scene/src/articulate_anything/prompts/agent.py", line 79, in generate_prediction
+    prompt_parts = self.make_prompt_parts(*args, **kwargs)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/vlongle/code/auto-interable-scene/src/articulate_anything/prompts/agent.py", line 47, in make_prompt_parts
+    prompt_parts = self._make_prompt_parts(*args, **kwargs)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/vlongle/code/auto-interable-scene/src/articulate_anything/prompts/critic/joint_critic.py", line 258, in _make_prompt_parts
+    prompt_parts.extend(self._get_in_context_examples())
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/vlongle/code/auto-interable-scene/src/articulate_anything/prompts/critic/joint_critic.py", line 277, in _get_in_context_examples
+    selected_examples = self._select_examples(failure_reasons)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/vlongle/code/auto-interable-scene/src/articulate_anything/prompts/critic/joint_critic.py", line 290, in _select_examples
+    for obj_id in os.listdir(reason_dir):
+                  ^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/mnt/kostas-graid/datasets/vlongle/articulate-anything/in_context_examples_datasets/success'

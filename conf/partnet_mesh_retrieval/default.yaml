@@ -1,0 +1,4 @@
+threshold: 0.5
+embedding_path: partnet_mobility_embeddings.csv
+rerank_using_bigger_clip: true
+mesh_include_description: true

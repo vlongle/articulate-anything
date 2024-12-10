@@ -1,0 +1,5 @@
+object_id: 47645
+Robot Link Summary:
+ - base
+ - lid
+ - box_body

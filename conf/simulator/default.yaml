@@ -1,0 +1,37 @@
+name: sapien # (sapien)
+camera_params:
+  width: 640
+  height: 480
+  views:
+    frontview:
+      cam_pos: [3, 1.5, 2]
+      look_at: [0, 0, 0.8]
+floor_texture: plain # (plain, checkerboard)
+use_segmentation: false
+object_white: true
+ray_tracing: false
+headless: true
+flip_video: false
+simulation_params:
+  stationary_or_move: stationary # (stationary, move)
+  num_steps: 50
+  joint_name: "all" # (all, {or specific joint_id})
+  joint_move_dir: "auto" # (auto, move_up, move_down)
+output:
+  dir: null
+  seg_json: null
+urdf:
+  file: null
+  raise_distance_file: null
+  raise_distance_offset: 0
+  rotation_pose:
+    rx: 0
+    ry: 0
+    rz: 0
+engine:
+  timestep: 0.01
+lighting:
+  ambient: [0.5, 0.5, 0.5]
+  directional:
+    direction: [0, 1, -1]
+    color: [0.5, 0.5, 0.5]

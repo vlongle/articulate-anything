@@ -1,0 +1,4 @@
+mode: video # (video)
+type: incontext # (basic, incontext)
+use_cotracker: true
+examples_dir: null ## for `incontext` prompting only

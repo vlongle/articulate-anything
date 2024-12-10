@@ -1,0 +1,8 @@
+object_id: 103739
+Robot Link Summary:
+ - base
+ - blade
+ - blade_2
+ - blade_3
+ - blade_4
+ - knife_body

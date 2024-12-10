@@ -1,0 +1,8 @@
+mode: online # (online, offline). Offline uses more memory
+checkpoint_path: "../co-tracker/checkpoints/cotracker2.pth"
+grid_size: 30
+render_all: false
+displacement_threshold: null
+max_moving_points: null
+linewidth: 5
+overwrite: true

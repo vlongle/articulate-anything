@@ -1,0 +1,8 @@
+object_id: 48018
+Robot Link Summary:
+ - base
+ - door
+ - door_2
+ - door_3
+ - door_4
+ - furniture_body

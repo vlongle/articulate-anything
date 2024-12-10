@@ -1,0 +1,58 @@
+The video shows a washing machine with a door that opens outward. The door is attached to the washing machine body with a hinge at the left side of the door. The door opens up to about 90 degrees.
+
+```python
+from articulate_anything.api.odio_urdf import *
+
+
+def partnet_103480(input_dir, links) -> Robot:
+    pred_robot = Robot(input_dir=input_dir, name="washing_machine")
+    pred_robot.add_link(links['base'])
+    pred_robot.add_link(links['washing_machine_body'])
+    pred_robot.add_joint(Joint("base_to_washing_machine_body",
+                         Parent("base"),
+                         Child("washing_machine_body"),
+                         type="fixed"),
+                         )
+    pred_robot.add_link(links['door'])
+    pred_robot.place_relative_to('door', 'washing_machine_body',
+                                 placement="front",
+                                 clearance=0.0)
+    pred_robot.add_link(links['knob'])
+    pred_robot.place_relative_to('knob', 'washing_machine_body',
+                                 placement="front",
+                                 clearance=0.0)
+
+    for button_idx in range(6):
+        button_link = "button" if button_idx == 0 else f"button_{button_idx+1}"
+        pred_robot.add_link(links[button_link])
+        pred_robot.place_relative_to(button_link, 'washing_machine_body',
+                                     placement="front",
+                                     clearance=0.0)
+    # ====================JOINT PREDICTION====================
+    # -- Groundtruth video analysis --
+    # in the groundtruth video, the door opens up while its LEFT part still
+    # attached to the body so the pivot point needs to be Back-Left-Bottom (BLB)
+    # or Back-Left-Top (BLT)
+    door_bb = pred_robot.get_bounding_boxes(
+        ['door'], include_dim=False)['door']
+    door_vertices = compute_aabb_vertices(*door_bb)
+    pivot_point = door_vertices[0]  # Back-Left-Bottom (BLB)
+
+    pred_robot.make_revolute_joint(
+        "door",
+        "washing_machine_body",
+        global_axis=[
+            0,
+            0,
+            # pivot-axis relationship:
+            # since the pivot is on the left and we want to open outward, set
+            # axis to negative
+            -1,
+        ],  # The door swings open and closed around the vertical axis,
+        # which is the z-axis. Negative z-axis because the pivot point is on the left
+        lower_angle_deg=0,
+        upper_angle_deg=90,  # open outward
+        pivot_point=pivot_point,
+    )
+    return pred_robot
+```

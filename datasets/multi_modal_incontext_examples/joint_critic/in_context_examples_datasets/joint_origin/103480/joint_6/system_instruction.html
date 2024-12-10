@@ -1,0 +1,1517 @@
+
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.3.1/styles/default.min.css">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.3.1/highlight.min.js"></script>
+        <script>hljs.highlightAll();</script>
+        <style>
+            .image-row {
+                display: flex;
+                flex-wrap: nowrap;
+                margin-bottom: 20px;
+            }
+            .image-row img {
+                margin-right: 1px;
+                max-width: 300px;
+                max-height: 300px;
+                height: auto;
+            }
+        </style>
+    </head>
+    <body>
+    <p><blockquote>
+  <h2>General Instructions</h2>
+  
+  <p>You're a robotics expert whose job is to complete the articulation of an object.</p>
+  
+  <p>The links represent parts of an object and are already defined using meshes. Further, the placement of various object parts (links) have also already been done for you.</p>
+  
+  <p>You're only responsible for creating the joint for the object. Particularly, we will provide you the function <code>partnet_{object_id}</code> that has object placement, you're responsible to fill in this function to create joints.</p>
+  
+  <p>Note that your <code>partnet_{object_id}</code> function must begin with the code that we provide you for the object placement. Then you must include this comment
+  "# ====================JOINT PREDICTION====================" before you start writing the code for the joint prediction. Please ensure that the code
+  runs without any errors. DO NOT MODIFY the link placement code. Make sure to use the same link names as provided in the link placement code.</p>
+  
+  <p>We have some helper functions that might be useful for you.</p>
+  
+  <div class="codehilite">
+<pre><span></span><code>    <span class="k">def</span> <span class="nf">get_bounding_boxes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">link_names</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">include_dim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+        <span class="c1"># Gets the AABB bounding boxes for specified links on a robot in PyBullet.</span>
+        <span class="c1">#</span>
+        <span class="c1"># Args:</span>
+        <span class="c1">#     link_names (list): A list of strings representing the names of the links to get bounding boxes for.</span>
+        <span class="c1">#     include_dim (bool): If True, include the dimensions of the bounding box. The dimensions are length,</span>
+        <span class="c1">#     width, and height.</span>
+        <span class="c1">#</span>
+        <span class="c1"># Returns:</span>
+        <span class="c1">#     dict: A dictionary mapping link names to tuples of (aabb_min, aabb_max) coordinates.</span>
+
+    <span class="k">def</span> <span class="nf">make_revolute_joint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">child_link_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">parent_link_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">global_axis</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">lower_angle_deg</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">upper_angle_deg</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">force_overwrite</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">pivot_point</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># Creates or updates a revolute joint between the specified child and parent links.</span>
+
+        <span class="c1"># Args:</span>
+        <span class="c1">#     child_link_name (str): Name of the child link.</span>
+        <span class="c1">#     parent_link_name (str): Name of the parent link.</span>
+        <span class="c1">#     global_axis (list): The rotation axis of the joint in the world frame.</span>
+        <span class="c1">#     lower_angle_deg (float): The lower joint angle limit in degrees.</span>
+        <span class="c1">#     upper_angle_deg (float): The upper joint angle limit in degrees.</span>
+        <span class="c1">#     force_overwrite (bool, optional): If True, overwrite existing joint.</span>
+        <span class="c1">#     pivot_point (list, optional): The pivot point for the rotation in the world frame.</span>
+
+    <span class="k">def</span> <span class="nf">make_prismatic_joint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">child_link_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">parent_link_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">global_lower_point</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">global_upper_point</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">force_overwrite</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># Creates or updates a prismatic joint between the specified child and parent links.</span>
+
+        <span class="c1"># Args:</span>
+        <span class="c1">#     child_link_name (str): Name of the child link.</span>
+        <span class="c1">#     parent_link_name (str): Name of the parent link.</span>
+        <span class="c1">#     global_lower_point (list): The global coordinates of the lower point.</span>
+        <span class="c1">#     global_upper_point (list): The global coordinates of the upper point.</span>
+        <span class="c1">#     force_overwrite (bool): If True, overwrite existing joint.</span>
+</code></pre>
+  </div>
+  
+  <p>These functions are the class functions of <code>Robot</code>. For example, you can call <code>pred_robot.get_bounding_boxes(...)</code>. The following function(s) are helper functions
+  and are not bound to any particular class.</p>
+  
+  <div class="codehilite">
+<pre><span></span><code>    <span class="k">def</span> <span class="nf">compute_aabb_vertices</span><span class="p">(</span><span class="n">aabb_min</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span> <span class="n">aabb_max</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+        <span class="c1"># Computes the 8 vertices of an axis-aligned bounding box. x-axis is front back, y-axis is left right, z-axis is up down.</span>
+
+        <span class="c1"># Args:</span>
+        <span class="c1"># aabb_min (list or numpy.ndarray): A list or array of 3 elements representing the minimum x, y, and z coordinates.</span>
+        <span class="c1"># aabb_max (list or numpy.ndarray): A list or array of 3 elements representing the maximum x, y, and z coordinates.</span>
+
+        <span class="c1"># Returns:</span>
+        <span class="c1"># numpy.ndarray: An 8x3 array where each row represents the coordinates of a vertex.</span>
+        <span class="c1"># The vertices are ordered as follows:</span>
+        <span class="c1"># 0: Back-Left-Bottom (BLB)</span>
+        <span class="c1"># 1: Back-Right-Bottom (BRB)</span>
+        <span class="c1"># 2: Front-Left-Bottom (FLB)</span>
+        <span class="c1"># 3: Front-Right-Bottom (FRB)</span>
+        <span class="c1"># 4: Back-Left-Top (BLT)</span>
+        <span class="c1"># 5: Back-Right-Top (BRT)</span>
+        <span class="c1"># 6: Front-Left-Top (FLT)</span>
+        <span class="c1"># 7: Front-Right-Top (FRT)</span>
+</code></pre>
+  </div>
+  
+  <h2>Examples</h2>
+  
+  <p>We also provide you with some examples</p>
+  
+  <div class="codehilite">
+<pre><span></span><code><span class="kn">from</span> <span class="nn">articulate_anything.api.odio_urdf</span> <span class="kn">import</span> <span class="o">*</span>
+
+
+<span class="k">def</span> <span class="nf">partnet_100248</span><span class="p">(</span><span class="n">input_dir</span><span class="p">,</span> <span class="n">links</span><span class="p">,</span> <span class="n">joint_id</span><span class="o">=</span><span class="s2">&quot;joint_0&quot;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    No. masked_links: 3</span>
+<span class="sd">    Robot Link Summary:</span>
+<span class="sd">    - base</span>
+<span class="sd">    - handle</span>
+<span class="sd">    - suitcase_body</span>
+
+<span class="sd">    Object: a suitcase with a handle</span>
+<span class="sd">    Targetted affordance: &quot;handle&quot;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">pred_robot</span> <span class="o">=</span> <span class="n">Robot</span><span class="p">(</span><span class="n">input_dir</span><span class="o">=</span><span class="n">input_dir</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;suitcase&quot;</span><span class="p">)</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_link</span><span class="p">(</span><span class="n">links</span><span class="p">[</span><span class="s2">&quot;base&quot;</span><span class="p">])</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_link</span><span class="p">(</span><span class="n">links</span><span class="p">[</span><span class="s2">&quot;suitcase_body&quot;</span><span class="p">])</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_joint</span><span class="p">(</span>
+        <span class="n">Joint</span><span class="p">(</span>
+            <span class="s2">&quot;base_to_suitcase_body&quot;</span><span class="p">,</span>
+            <span class="n">Parent</span><span class="p">(</span><span class="s2">&quot;base&quot;</span><span class="p">),</span>
+            <span class="n">Child</span><span class="p">(</span><span class="s2">&quot;suitcase_body&quot;</span><span class="p">),</span>
+            <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;fixed&quot;</span><span class="p">,</span>
+        <span class="p">),</span>
+    <span class="p">)</span>
+
+    <span class="c1"># we actually want to place the handle inside the suitcase, and not above.</span>
+    <span class="c1"># so we need to shift the handle down by its height. We first place it above</span>
+    <span class="c1"># then compute the height and shift it down by that amount using clearance</span>
+    <span class="c1"># and remove the previous placement</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_link</span><span class="p">(</span><span class="n">links</span><span class="p">[</span><span class="s2">&quot;handle&quot;</span><span class="p">])</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">place_relative_to</span><span class="p">(</span>
+        <span class="s2">&quot;handle&quot;</span><span class="p">,</span> <span class="s2">&quot;suitcase_body&quot;</span><span class="p">,</span> <span class="n">placement</span><span class="o">=</span><span class="s2">&quot;above&quot;</span><span class="p">,</span> <span class="n">clearance</span><span class="o">=</span><span class="mf">0.0</span>
+    <span class="p">)</span>
+    <span class="n">bb</span> <span class="o">=</span> <span class="n">pred_robot</span><span class="o">.</span><span class="n">get_bounding_boxes</span><span class="p">([</span><span class="s2">&quot;handle&quot;</span><span class="p">],</span> <span class="n">include_dim</span><span class="o">=</span><span class="kc">True</span><span class="p">)[</span><span class="s2">&quot;handle&quot;</span><span class="p">]</span>
+    <span class="n">bb_dim</span> <span class="o">=</span> <span class="n">bb</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">place_relative_to</span><span class="p">(</span>
+        <span class="s2">&quot;handle&quot;</span><span class="p">,</span> <span class="s2">&quot;suitcase_body&quot;</span><span class="p">,</span> <span class="n">placement</span><span class="o">=</span><span class="s2">&quot;above&quot;</span><span class="p">,</span> <span class="n">clearance</span><span class="o">=-</span><span class="n">bb_dim</span><span class="p">[</span><span class="s2">&quot;height&quot;</span><span class="p">]</span>
+    <span class="p">)</span>  <span class="c1"># for prismatic joint, we need to specify the lower and upper points corresponding</span>
+
+    <span class="c1"># ====================JOINT PREDICTION====================</span>
+    <span class="n">factor</span> <span class="o">=</span> <span class="mf">0.85</span>  <span class="c1"># not fully all the way up</span>
+    <span class="c1"># to where the handle is at lower and upper limit of the joint</span>
+    <span class="n">lower_point</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="mi">0</span><span class="p">,</span>
+        <span class="mi">0</span><span class="p">,</span>
+        <span class="mi">0</span><span class="p">,</span>
+    <span class="p">]</span>  <span class="c1"># the handle is fully retracted. At the same pos (hide in the box) ## TUNABLE</span>
+    <span class="c1"># this handle moves along z-axis</span>
+    <span class="n">upper_point</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="mi">0</span><span class="p">,</span>
+        <span class="mi">0</span><span class="p">,</span>
+        <span class="n">factor</span> <span class="o">*</span> <span class="n">bb_dim</span><span class="p">[</span><span class="s2">&quot;height&quot;</span><span class="p">],</span>
+    <span class="p">]</span>  <span class="c1"># the handle is fully extended. At the same pos as the handle_height ## TUNABLE</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">make_prismatic_joint</span><span class="p">(</span>
+        <span class="s2">&quot;handle&quot;</span><span class="p">,</span> <span class="s2">&quot;suitcase_body&quot;</span><span class="p">,</span> <span class="n">lower_point</span><span class="p">,</span> <span class="n">upper_point</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">pred_robot</span>
+
+
+<span class="k">def</span> <span class="nf">partnet_47645</span><span class="p">(</span><span class="n">input_dir</span><span class="p">,</span> <span class="n">links</span><span class="p">,</span> <span class="n">joint_id</span><span class="o">=</span><span class="s2">&quot;joint_0&quot;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    No. masked_links: 3</span>
+<span class="sd">    Robot Link Summary:</span>
+<span class="sd">    - base</span>
+<span class="sd">    - lid</span>
+<span class="sd">    - box_body</span>
+
+
+<span class="sd">    Object: a treasure chest</span>
+<span class="sd">    Targetted affordance: &quot;lid&quot;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">pred_robot</span> <span class="o">=</span> <span class="n">Robot</span><span class="p">(</span><span class="n">input_dir</span><span class="o">=</span><span class="n">input_dir</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;treasure_chest&quot;</span><span class="p">)</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_link</span><span class="p">(</span><span class="n">links</span><span class="p">[</span><span class="s2">&quot;base&quot;</span><span class="p">])</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_link</span><span class="p">(</span><span class="n">links</span><span class="p">[</span><span class="s2">&quot;box_body&quot;</span><span class="p">])</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_joint</span><span class="p">(</span>
+        <span class="n">Joint</span><span class="p">(</span><span class="s2">&quot;base_to_box_body&quot;</span><span class="p">,</span> <span class="n">Parent</span><span class="p">(</span><span class="s2">&quot;base&quot;</span><span class="p">),</span>
+              <span class="n">Child</span><span class="p">(</span><span class="s2">&quot;box_body&quot;</span><span class="p">),</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;fixed&quot;</span><span class="p">),</span>
+    <span class="p">)</span>
+
+    <span class="c1"># lid goes on top of the box. No clearance or further adjustment needed</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_link</span><span class="p">(</span><span class="n">links</span><span class="p">[</span><span class="s2">&quot;lid&quot;</span><span class="p">])</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">place_relative_to</span><span class="p">(</span>
+        <span class="s2">&quot;lid&quot;</span><span class="p">,</span> <span class="s2">&quot;box_body&quot;</span><span class="p">,</span> <span class="n">placement</span><span class="o">=</span><span class="s2">&quot;above&quot;</span><span class="p">,</span> <span class="n">clearance</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
+    <span class="c1"># ========================================================</span>
+
+    <span class="c1"># ====================JOINT PREDICTION====================</span>
+    <span class="c1"># -- Groundtruth video analysis --</span>
+    <span class="c1"># in the groundtruth video, the lid is attached to the body at the BACK and bottom of the lid</span>
+    <span class="c1"># so pivot point needs to either be Back-Left-Bottom (BLB) or Back-Right-Bottom (BRB)</span>
+    <span class="n">lid_bb</span> <span class="o">=</span> <span class="n">pred_robot</span><span class="o">.</span><span class="n">get_bounding_boxes</span><span class="p">([</span><span class="s2">&quot;lid&quot;</span><span class="p">],</span> <span class="n">include_dim</span><span class="o">=</span><span class="kc">False</span><span class="p">)[</span><span class="s2">&quot;lid&quot;</span><span class="p">]</span>
+    <span class="n">lid_vertices</span> <span class="o">=</span> <span class="n">compute_aabb_vertices</span><span class="p">(</span><span class="o">*</span><span class="n">lid_bb</span><span class="p">)</span>
+    <span class="n">pivot_point</span> <span class="o">=</span> <span class="n">lid_vertices</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># Back-Left-Bottom (BLB)</span>
+
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">make_revolute_joint</span><span class="p">(</span>
+        <span class="s2">&quot;lid&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;box_body&quot;</span><span class="p">,</span>
+        <span class="n">global_axis</span><span class="o">=</span><span class="p">[</span>
+            <span class="mi">0</span><span class="p">,</span>
+            <span class="c1"># pivot-axis relationship:</span>
+            <span class="c1"># since the pivot is on the back and we want to open upward, set</span>
+            <span class="c1"># axis to negative</span>
+            <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+            <span class="mi">0</span><span class="p">,</span>
+        <span class="p">],</span>  <span class="c1"># the lid of the treasure chest opens up and down so rotates along the left-right axis,</span>
+        <span class="c1"># which is the y-axis</span>
+        <span class="n">lower_angle_deg</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">upper_angle_deg</span><span class="o">=</span><span class="mi">90</span><span class="p">,</span>
+        <span class="n">pivot_point</span><span class="o">=</span><span class="n">pivot_point</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">pred_robot</span>
+
+
+<span class="k">def</span> <span class="nf">partnet_3398</span><span class="p">(</span><span class="n">input_dir</span><span class="p">,</span> <span class="n">links</span><span class="p">,</span> <span class="n">joint_id</span><span class="o">=</span><span class="s2">&quot;joint_0&quot;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    No. masked_links: 4</span>
+<span class="sd">    Robot Link Summary:</span>
+<span class="sd">    - base</span>
+<span class="sd">    - lid</span>
+<span class="sd">    - bottle_body</span>
+
+<span class="sd">    Object: a bottle of soap</span>
+<span class="sd">    Targetted affordance: &quot;lid&quot;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">pred_robot</span> <span class="o">=</span> <span class="n">Robot</span><span class="p">(</span><span class="n">input_dir</span><span class="o">=</span><span class="n">input_dir</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;soap_bottle&quot;</span><span class="p">)</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_link</span><span class="p">(</span><span class="n">links</span><span class="p">[</span><span class="s2">&quot;base&quot;</span><span class="p">])</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_link</span><span class="p">(</span><span class="n">links</span><span class="p">[</span><span class="s2">&quot;bottle_body&quot;</span><span class="p">])</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_joint</span><span class="p">(</span>
+        <span class="n">Joint</span><span class="p">(</span>
+            <span class="s2">&quot;base_to_bottle_body&quot;</span><span class="p">,</span> <span class="n">Parent</span><span class="p">(</span><span class="s2">&quot;base&quot;</span><span class="p">),</span> <span class="n">Child</span><span class="p">(</span><span class="s2">&quot;bottle_body&quot;</span><span class="p">),</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;fixed&quot;</span>
+        <span class="p">),</span>
+    <span class="p">)</span>
+
+    <span class="c1"># lid goes on top of the bottle. No clearance or further adjustment needed</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_link</span><span class="p">(</span><span class="n">links</span><span class="p">[</span><span class="s2">&quot;lid&quot;</span><span class="p">])</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">place_relative_to</span><span class="p">(</span>
+        <span class="s2">&quot;lid&quot;</span><span class="p">,</span> <span class="s2">&quot;bottle_body&quot;</span><span class="p">,</span> <span class="n">placement</span><span class="o">=</span><span class="s2">&quot;above&quot;</span><span class="p">,</span> <span class="n">clearance</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
+    <span class="c1"># ========================================================</span>
+
+    <span class="c1"># ====================JOINT PREDICTION====================</span>
+    <span class="c1"># rotate around the center of the lid / bottle body.</span>
+    <span class="c1"># -- Groundtruth video analysis --</span>
+    <span class="c1"># in the groundtruth video, the lid around the bottle&#39;s body so the lid is rotating</span>
+    <span class="c1"># around its own center of mass</span>
+    <span class="c1"># do not set pivot_point</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">make_revolute_joint</span><span class="p">(</span>
+        <span class="s2">&quot;lid&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;bottle_body&quot;</span><span class="p">,</span>
+        <span class="n">global_axis</span><span class="o">=</span><span class="p">[</span>
+            <span class="mi">0</span><span class="p">,</span>
+            <span class="mi">0</span><span class="p">,</span>
+            <span class="mi">1</span><span class="p">,</span>
+        <span class="p">],</span>  <span class="c1"># the bottle lid twists open and close, so it rotates around its vertical axis,</span>
+        <span class="c1"># which is the z-axis</span>
+        <span class="n">lower_angle_deg</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">upper_angle_deg</span><span class="o">=</span><span class="mi">360</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">pred_robot</span>
+
+
+<span class="k">def</span> <span class="nf">partnet_102658</span><span class="p">(</span><span class="n">input_dir</span><span class="p">,</span> <span class="n">links</span><span class="p">,</span> <span class="n">joint_id</span><span class="o">=</span><span class="s2">&quot;joint_0&quot;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    No. masked_links: 4</span>
+<span class="sd">    Robot Link Summary:</span>
+<span class="sd">    - base</span>
+<span class="sd">    - lid</span>
+<span class="sd">    - seat</span>
+<span class="sd">    - toilet_body</span>
+
+
+<span class="sd">    Object: a toilet</span>
+<span class="sd">    Targetted affordance: &quot;lid&quot;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">pred_robot</span> <span class="o">=</span> <span class="n">Robot</span><span class="p">(</span><span class="n">input_dir</span><span class="o">=</span><span class="n">input_dir</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;toilet&quot;</span><span class="p">)</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_link</span><span class="p">(</span><span class="n">links</span><span class="p">[</span><span class="s2">&quot;base&quot;</span><span class="p">])</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_link</span><span class="p">(</span><span class="n">links</span><span class="p">[</span><span class="s2">&quot;toilet_body&quot;</span><span class="p">])</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_joint</span><span class="p">(</span>
+        <span class="n">Joint</span><span class="p">(</span>
+            <span class="s2">&quot;base_to_toilet_body&quot;</span><span class="p">,</span> <span class="n">Parent</span><span class="p">(</span><span class="s2">&quot;base&quot;</span><span class="p">),</span> <span class="n">Child</span><span class="p">(</span><span class="s2">&quot;toilet_body&quot;</span><span class="p">),</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;fixed&quot;</span>
+        <span class="p">),</span>
+    <span class="p">)</span>
+
+    <span class="c1"># seat goes on top of the toilet body. No clearance or further adjustment needed</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_link</span><span class="p">(</span><span class="n">links</span><span class="p">[</span><span class="s2">&quot;seat&quot;</span><span class="p">])</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">place_relative_to</span><span class="p">(</span>
+        <span class="s2">&quot;seat&quot;</span><span class="p">,</span> <span class="s2">&quot;toilet_body&quot;</span><span class="p">,</span> <span class="n">placement</span><span class="o">=</span><span class="s2">&quot;above&quot;</span><span class="p">,</span> <span class="n">clearance</span><span class="o">=</span><span class="mf">0.0</span>
+    <span class="p">)</span>
+    <span class="c1"># ========================================================</span>
+
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_link</span><span class="p">(</span><span class="n">links</span><span class="p">[</span><span class="s2">&quot;lid&quot;</span><span class="p">])</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">place_relative_to</span><span class="p">(</span>
+        <span class="s2">&quot;lid&quot;</span><span class="p">,</span> <span class="s2">&quot;toilet_body&quot;</span><span class="p">,</span> <span class="n">placement</span><span class="o">=</span><span class="s2">&quot;above&quot;</span><span class="p">,</span> <span class="n">clearance</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
+
+    <span class="c1"># ====================JOINT PREDICTION====================</span>
+    <span class="c1"># -- Groundtruth video analysis --</span>
+    <span class="c1"># in the groundtruth video, the toilet lid opens up while its back parts still attached</span>
+    <span class="c1"># to the body so the pivot point needs to be Back-Left-Bottom (BLB) or Back-Right-Bottom (BRB)</span>
+    <span class="n">lid_bb</span> <span class="o">=</span> <span class="n">pred_robot</span><span class="o">.</span><span class="n">get_bounding_boxes</span><span class="p">([</span><span class="s2">&quot;lid&quot;</span><span class="p">],</span> <span class="n">include_dim</span><span class="o">=</span><span class="kc">False</span><span class="p">)[</span><span class="s2">&quot;lid&quot;</span><span class="p">]</span>
+    <span class="n">lid_vertices</span> <span class="o">=</span> <span class="n">compute_aabb_vertices</span><span class="p">(</span><span class="o">*</span><span class="n">lid_bb</span><span class="p">)</span>
+    <span class="n">pivot_point</span> <span class="o">=</span> <span class="n">lid_vertices</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># Back-Left-Bottom (BLB)</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">make_revolute_joint</span><span class="p">(</span>
+        <span class="s2">&quot;lid&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;toilet_body&quot;</span><span class="p">,</span>
+        <span class="n">global_axis</span><span class="o">=</span><span class="p">[</span>
+            <span class="mi">0</span><span class="p">,</span>
+            <span class="c1"># pivot-axis relationship:</span>
+            <span class="c1"># since the pivot is on the back and we want to open upward, set</span>
+            <span class="c1"># axis to negative</span>
+            <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+            <span class="mi">0</span><span class="p">,</span>
+        <span class="p">],</span>  <span class="c1"># it rotates along the left-right axis,</span>
+        <span class="c1"># which is the y-axis</span>
+        <span class="n">lower_angle_deg</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">upper_angle_deg</span><span class="o">=</span><span class="mi">90</span><span class="p">,</span>  <span class="c1"># NOTE: might need to tune this by visual feedback</span>
+        <span class="n">pivot_point</span><span class="o">=</span><span class="n">pivot_point</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">pred_robot</span>
+
+
+<span class="k">def</span> <span class="nf">partnet_103015</span><span class="p">(</span><span class="n">input_dir</span><span class="p">,</span> <span class="n">links</span><span class="p">,</span> <span class="n">joint_id</span><span class="o">=</span><span class="s2">&quot;joint_2&quot;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    No. masked_links: 5</span>
+<span class="sd">    Robot Link Summary:</span>
+<span class="sd">    - base</span>
+<span class="sd">    - window_frame</span>
+<span class="sd">    - window</span>
+<span class="sd">    - window_2</span>
+<span class="sd">    - window_3</span>
+
+<span class="sd">    Object: a window</span>
+<span class="sd">    Targetted affordance: &quot;window_3&quot;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">pred_robot</span> <span class="o">=</span> <span class="n">Robot</span><span class="p">(</span><span class="n">input_dir</span><span class="o">=</span><span class="n">input_dir</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;window&quot;</span><span class="p">)</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_link</span><span class="p">(</span><span class="n">links</span><span class="p">[</span><span class="s2">&quot;base&quot;</span><span class="p">])</span>
+
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_link</span><span class="p">(</span><span class="n">links</span><span class="p">[</span><span class="s2">&quot;window_frame&quot;</span><span class="p">])</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_joint</span><span class="p">(</span>
+        <span class="n">Joint</span><span class="p">(</span>
+            <span class="s2">&quot;base_to_window_frame&quot;</span><span class="p">,</span> <span class="n">Parent</span><span class="p">(</span><span class="s2">&quot;base&quot;</span><span class="p">),</span> <span class="n">Child</span><span class="p">(</span><span class="s2">&quot;window_frame&quot;</span><span class="p">),</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;fixed&quot;</span>
+        <span class="p">),</span>
+    <span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">window_link</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;window&quot;</span><span class="p">,</span> <span class="s2">&quot;window_2&quot;</span><span class="p">,</span> <span class="s2">&quot;window_3&quot;</span><span class="p">]:</span>
+        <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_link</span><span class="p">(</span><span class="n">links</span><span class="p">[</span><span class="n">window_link</span><span class="p">])</span>
+
+        <span class="c1"># we actually want to place the window_link inside the window_frame, and not above.</span>
+        <span class="c1"># so we need to shift the window_frame down by its height. We first place it above</span>
+        <span class="c1"># then compute the height and shift it down by that amount using clearance</span>
+        <span class="c1"># and remove the previous placement</span>
+        <span class="n">pred_robot</span><span class="o">.</span><span class="n">place_relative_to</span><span class="p">(</span>
+            <span class="n">window_link</span><span class="p">,</span> <span class="s2">&quot;window_frame&quot;</span><span class="p">,</span> <span class="n">placement</span><span class="o">=</span><span class="s2">&quot;above&quot;</span><span class="p">,</span> <span class="n">clearance</span><span class="o">=</span><span class="mf">0.0</span>
+        <span class="p">)</span>
+
+        <span class="n">bbox</span> <span class="o">=</span> <span class="n">pred_robot</span><span class="o">.</span><span class="n">get_bounding_boxes</span><span class="p">([</span><span class="n">window_link</span><span class="p">],</span> <span class="n">include_dim</span><span class="o">=</span><span class="kc">True</span><span class="p">)[</span>
+            <span class="n">window_link</span>
+        <span class="p">]</span>
+        <span class="n">bbox_dim</span> <span class="o">=</span> <span class="n">bbox</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="n">pred_robot</span><span class="o">.</span><span class="n">place_relative_to</span><span class="p">(</span>
+            <span class="n">window_link</span><span class="p">,</span>
+            <span class="s2">&quot;window_frame&quot;</span><span class="p">,</span>
+            <span class="n">placement</span><span class="o">=</span><span class="s2">&quot;above&quot;</span><span class="p">,</span>
+            <span class="n">clearance</span><span class="o">=-</span><span class="n">bbox_dim</span><span class="p">[</span><span class="s2">&quot;height&quot;</span><span class="p">],</span>
+        <span class="p">)</span>
+
+    <span class="c1"># ========================================================</span>
+
+    <span class="c1"># ====================JOINT PREDICTION====================</span>
+    <span class="c1"># -- Groundtruth video analysis --</span>
+    <span class="c1"># in the groundtruth video, the window opens up while its top parts still attached</span>
+    <span class="c1"># to the frame so the pivot point needs</span>
+    <span class="c1"># to be Back-Left-Top or Back-Right-Top</span>
+    <span class="n">target_window_link</span> <span class="o">=</span> <span class="s2">&quot;window_3&quot;</span>
+    <span class="n">bbox</span> <span class="o">=</span> <span class="n">pred_robot</span><span class="o">.</span><span class="n">get_bounding_boxes</span><span class="p">([</span><span class="n">target_window_link</span><span class="p">],</span> <span class="n">include_dim</span><span class="o">=</span><span class="kc">False</span><span class="p">)[</span>
+        <span class="n">target_window_link</span>
+    <span class="p">]</span>
+    <span class="n">vertices</span> <span class="o">=</span> <span class="n">compute_aabb_vertices</span><span class="p">(</span><span class="o">*</span><span class="n">bbox</span><span class="p">)</span>
+    <span class="n">pivot_point</span> <span class="o">=</span> <span class="n">vertices</span><span class="p">[</span>
+        <span class="mi">4</span>
+    <span class="p">]</span>  <span class="c1"># Back-Left-Top ## rotate around the point attached to the frame</span>
+    <span class="c1"># so &quot;back&quot; and &quot;top&quot; are important.</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">make_revolute_joint</span><span class="p">(</span>
+        <span class="n">target_window_link</span><span class="p">,</span>
+        <span class="s2">&quot;window_frame&quot;</span><span class="p">,</span>
+        <span class="n">global_axis</span><span class="o">=</span><span class="p">[</span>
+            <span class="mi">0</span><span class="p">,</span>
+            <span class="c1"># pivot-axis relationship:</span>
+            <span class="c1"># since the pivot is on the top and we want to open outward, set</span>
+            <span class="c1"># axis to negative</span>
+            <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+            <span class="mi">0</span><span class="p">,</span>
+        <span class="p">],</span>  <span class="c1"># this window opens up and down so rotates along the left-right axis,</span>
+        <span class="c1"># which is the y-axis</span>
+        <span class="n">lower_angle_deg</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">upper_angle_deg</span><span class="o">=</span><span class="mi">90</span><span class="p">,</span>  <span class="c1"># NOTE: the angle needs to be tuned by visual feedback as well</span>
+        <span class="n">pivot_point</span><span class="o">=</span><span class="n">pivot_point</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">pred_robot</span>
+
+
+<span class="k">def</span> <span class="nf">partnet_40417</span><span class="p">(</span><span class="n">input_dir</span><span class="p">,</span> <span class="n">links</span><span class="p">,</span> <span class="n">joint_id</span><span class="o">=</span><span class="s2">&quot;joint_2&quot;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    No. masked_links: 8</span>
+<span class="sd">    Robot Link Summary:</span>
+<span class="sd">    - base</span>
+<span class="sd">    - door</span>
+<span class="sd">    - door_2</span>
+<span class="sd">    - drawer</span>
+<span class="sd">    - drawer_2</span>
+<span class="sd">    - door_3</span>
+<span class="sd">    - door_4</span>
+<span class="sd">    - furniture_body</span>
+
+<span class="sd">    Object: a kitchen cabinet with 4 doors and 2 drawers</span>
+<span class="sd">    Targetted affordance: drawer</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">pred_robot</span> <span class="o">=</span> <span class="n">Robot</span><span class="p">(</span><span class="n">input_dir</span><span class="o">=</span><span class="n">input_dir</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;kitchen_cabinet&quot;</span><span class="p">)</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_link</span><span class="p">(</span><span class="n">links</span><span class="p">[</span><span class="s2">&quot;base&quot;</span><span class="p">])</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_link</span><span class="p">(</span><span class="n">links</span><span class="p">[</span><span class="s2">&quot;furniture_body&quot;</span><span class="p">])</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_joint</span><span class="p">(</span>
+        <span class="n">Joint</span><span class="p">(</span>
+            <span class="s2">&quot;base_to_furniture_body&quot;</span><span class="p">,</span>
+            <span class="n">Parent</span><span class="p">(</span><span class="s2">&quot;base&quot;</span><span class="p">),</span>
+            <span class="n">Child</span><span class="p">(</span><span class="s2">&quot;furniture_body&quot;</span><span class="p">),</span>
+            <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;fixed&quot;</span><span class="p">,</span>
+        <span class="p">),</span>
+    <span class="p">)</span>
+
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_link</span><span class="p">(</span><span class="n">links</span><span class="p">[</span><span class="s2">&quot;door&quot;</span><span class="p">])</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">place_relative_to</span><span class="p">(</span>
+        <span class="s2">&quot;door&quot;</span><span class="p">,</span> <span class="s2">&quot;furniture_body&quot;</span><span class="p">,</span> <span class="n">placement</span><span class="o">=</span><span class="s2">&quot;front&quot;</span><span class="p">,</span> <span class="n">clearance</span><span class="o">=</span><span class="mf">0.0</span>
+    <span class="p">)</span>
+
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_link</span><span class="p">(</span><span class="n">links</span><span class="p">[</span><span class="s2">&quot;door_2&quot;</span><span class="p">])</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">place_relative_to</span><span class="p">(</span>
+        <span class="s2">&quot;door_2&quot;</span><span class="p">,</span> <span class="s2">&quot;furniture_body&quot;</span><span class="p">,</span> <span class="n">placement</span><span class="o">=</span><span class="s2">&quot;front&quot;</span><span class="p">,</span> <span class="n">clearance</span><span class="o">=</span><span class="mf">0.0</span>
+    <span class="p">)</span>
+
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_link</span><span class="p">(</span><span class="n">links</span><span class="p">[</span><span class="s2">&quot;door_3&quot;</span><span class="p">])</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">place_relative_to</span><span class="p">(</span>
+        <span class="s2">&quot;door_3&quot;</span><span class="p">,</span> <span class="s2">&quot;furniture_body&quot;</span><span class="p">,</span> <span class="n">placement</span><span class="o">=</span><span class="s2">&quot;front&quot;</span><span class="p">,</span> <span class="n">clearance</span><span class="o">=</span><span class="mf">0.0</span>
+    <span class="p">)</span>
+
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_link</span><span class="p">(</span><span class="n">links</span><span class="p">[</span><span class="s2">&quot;door_4&quot;</span><span class="p">])</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">place_relative_to</span><span class="p">(</span>
+        <span class="s2">&quot;door_4&quot;</span><span class="p">,</span> <span class="s2">&quot;furniture_body&quot;</span><span class="p">,</span> <span class="n">placement</span><span class="o">=</span><span class="s2">&quot;front&quot;</span><span class="p">,</span> <span class="n">clearance</span><span class="o">=</span><span class="mf">0.0</span>
+    <span class="p">)</span>
+
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_link</span><span class="p">(</span><span class="n">links</span><span class="p">[</span><span class="s2">&quot;drawer&quot;</span><span class="p">])</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">place_relative_to</span><span class="p">(</span>
+        <span class="s2">&quot;drawer&quot;</span><span class="p">,</span> <span class="s2">&quot;furniture_body&quot;</span><span class="p">,</span> <span class="n">placement</span><span class="o">=</span><span class="s2">&quot;inside&quot;</span><span class="p">,</span> <span class="n">clearance</span><span class="o">=</span><span class="mf">0.0</span>
+    <span class="p">)</span>
+
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_link</span><span class="p">(</span><span class="n">links</span><span class="p">[</span><span class="s2">&quot;drawer_2&quot;</span><span class="p">])</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">place_relative_to</span><span class="p">(</span>
+        <span class="s2">&quot;drawer_2&quot;</span><span class="p">,</span> <span class="s2">&quot;furniture_body&quot;</span><span class="p">,</span> <span class="n">placement</span><span class="o">=</span><span class="s2">&quot;inside&quot;</span><span class="p">,</span> <span class="n">clearance</span><span class="o">=</span><span class="mf">0.0</span>
+    <span class="p">)</span>
+
+    <span class="c1"># ====================JOINT PREDICTION====================</span>
+    <span class="n">target_drawer_link</span> <span class="o">=</span> <span class="s2">&quot;drawer&quot;</span>
+    <span class="n">lower_point</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="mi">0</span><span class="p">,</span>
+        <span class="mi">0</span><span class="p">,</span>
+        <span class="mi">0</span><span class="p">,</span>
+    <span class="p">]</span>  <span class="c1"># the drawer is fully retracted. At the same pos (hide in the box) ## TUNABLE</span>
+    <span class="n">bbox</span> <span class="o">=</span> <span class="n">pred_robot</span><span class="o">.</span><span class="n">get_bounding_boxes</span><span class="p">([</span><span class="n">target_drawer_link</span><span class="p">],</span> <span class="n">include_dim</span><span class="o">=</span><span class="kc">True</span><span class="p">)[</span>
+        <span class="n">target_drawer_link</span>
+    <span class="p">]</span>
+    <span class="n">bbox_dim</span> <span class="o">=</span> <span class="n">bbox</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="c1"># x, y, z corresponds to length, width, height</span>
+    <span class="c1"># this drawer moves along x-axis</span>
+    <span class="n">upper_point</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">bbox_dim</span><span class="p">[</span><span class="s2">&quot;length&quot;</span><span class="p">],</span>
+        <span class="mi">0</span><span class="p">,</span>
+        <span class="mi">0</span><span class="p">,</span>
+    <span class="p">]</span>  <span class="c1"># the drawer is fully extended. At the same pos as the drawer_width ## TUNABLE</span>
+    <span class="c1"># it slides forward and backward so x-axis</span>
+
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">make_prismatic_joint</span><span class="p">(</span>
+        <span class="n">target_drawer_link</span><span class="p">,</span> <span class="s2">&quot;furniture_body&quot;</span><span class="p">,</span> <span class="n">lower_point</span><span class="p">,</span> <span class="n">upper_point</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">pred_robot</span>
+
+
+<span class="k">def</span> <span class="nf">partnet_41003</span><span class="p">(</span><span class="n">input_dir</span><span class="p">,</span> <span class="n">links</span><span class="p">,</span> <span class="n">joint_id</span><span class="o">=</span><span class="s2">&quot;joint_1&quot;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    No. masked_links: 6</span>
+<span class="sd">    Robot Link Summary:</span>
+<span class="sd">    - base</span>
+<span class="sd">    - door</span>
+<span class="sd">    - door_2</span>
+<span class="sd">    - door_3</span>
+<span class="sd">    - door_4</span>
+<span class="sd">    - furniture_body</span>
+
+<span class="sd">    Object: a cabinet with 4 doors</span>
+<span class="sd">    Targetted affordance: &quot;door_2&quot;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">pred_robot</span> <span class="o">=</span> <span class="n">Robot</span><span class="p">(</span><span class="n">input_dir</span><span class="o">=</span><span class="n">input_dir</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;cabinet&quot;</span><span class="p">)</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_link</span><span class="p">(</span><span class="n">links</span><span class="p">[</span><span class="s2">&quot;base&quot;</span><span class="p">])</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_link</span><span class="p">(</span><span class="n">links</span><span class="p">[</span><span class="s2">&quot;furniture_body&quot;</span><span class="p">])</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_joint</span><span class="p">(</span>
+        <span class="n">Joint</span><span class="p">(</span>
+            <span class="s2">&quot;base_to_furniture_body&quot;</span><span class="p">,</span>
+            <span class="n">Parent</span><span class="p">(</span><span class="s2">&quot;base&quot;</span><span class="p">),</span>
+            <span class="n">Child</span><span class="p">(</span><span class="s2">&quot;furniture_body&quot;</span><span class="p">),</span>
+            <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;fixed&quot;</span><span class="p">,</span>
+        <span class="p">),</span>
+    <span class="p">)</span>
+
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_link</span><span class="p">(</span><span class="n">links</span><span class="p">[</span><span class="s2">&quot;door&quot;</span><span class="p">])</span>
+    <span class="c1"># cabinet doors go in front of the furniture body.</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">place_relative_to</span><span class="p">(</span>
+        <span class="s2">&quot;door&quot;</span><span class="p">,</span> <span class="s2">&quot;furniture_body&quot;</span><span class="p">,</span> <span class="n">placement</span><span class="o">=</span><span class="s2">&quot;front&quot;</span><span class="p">,</span> <span class="n">clearance</span><span class="o">=</span><span class="mf">0.0</span>
+    <span class="p">)</span>
+
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_link</span><span class="p">(</span><span class="n">links</span><span class="p">[</span><span class="s2">&quot;door_2&quot;</span><span class="p">])</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">place_relative_to</span><span class="p">(</span>
+        <span class="s2">&quot;door_2&quot;</span><span class="p">,</span> <span class="s2">&quot;furniture_body&quot;</span><span class="p">,</span> <span class="n">placement</span><span class="o">=</span><span class="s2">&quot;front&quot;</span><span class="p">,</span> <span class="n">clearance</span><span class="o">=</span><span class="mf">0.0</span>
+    <span class="p">)</span>
+
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_link</span><span class="p">(</span><span class="n">links</span><span class="p">[</span><span class="s2">&quot;door_3&quot;</span><span class="p">])</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">place_relative_to</span><span class="p">(</span>
+        <span class="s2">&quot;door_3&quot;</span><span class="p">,</span> <span class="s2">&quot;furniture_body&quot;</span><span class="p">,</span> <span class="n">placement</span><span class="o">=</span><span class="s2">&quot;front&quot;</span><span class="p">,</span> <span class="n">clearance</span><span class="o">=</span><span class="mf">0.0</span>
+    <span class="p">)</span>
+
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_link</span><span class="p">(</span><span class="n">links</span><span class="p">[</span><span class="s2">&quot;door_4&quot;</span><span class="p">])</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">place_relative_to</span><span class="p">(</span>
+        <span class="s2">&quot;door_4&quot;</span><span class="p">,</span> <span class="s2">&quot;furniture_body&quot;</span><span class="p">,</span> <span class="n">placement</span><span class="o">=</span><span class="s2">&quot;front&quot;</span><span class="p">,</span> <span class="n">clearance</span><span class="o">=</span><span class="mf">0.0</span>
+    <span class="p">)</span>
+    <span class="c1"># ====================JOINT PREDICTION====================</span>
+    <span class="c1"># -- Groundtruth video analysis --</span>
+    <span class="c1"># in the groundtruth video, the top-right door opens up while its RIGHT part of the door is still</span>
+    <span class="c1"># attached to the body so the pivot point needs to be Back-Right-Bottom (BRB)</span>
+    <span class="c1"># or Back-Right-Top (BRT)</span>
+
+    <span class="n">target_door_link</span> <span class="o">=</span> <span class="s2">&quot;door_2&quot;</span>
+    <span class="n">door_bb</span> <span class="o">=</span> <span class="n">pred_robot</span><span class="o">.</span><span class="n">get_bounding_boxes</span><span class="p">([</span><span class="n">target_door_link</span><span class="p">],</span> <span class="n">include_dim</span><span class="o">=</span><span class="kc">False</span><span class="p">)[</span>
+        <span class="n">target_door_link</span>
+    <span class="p">]</span>
+    <span class="n">door_vertices</span> <span class="o">=</span> <span class="n">compute_aabb_vertices</span><span class="p">(</span><span class="o">*</span><span class="n">door_bb</span><span class="p">)</span>
+    <span class="n">pivot_point</span> <span class="o">=</span> <span class="n">door_vertices</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>  <span class="c1"># Back-Right-Bottom (BRB)</span>
+
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">make_revolute_joint</span><span class="p">(</span>
+        <span class="n">target_door_link</span><span class="p">,</span>
+        <span class="s2">&quot;furniture_body&quot;</span><span class="p">,</span>
+        <span class="n">global_axis</span><span class="o">=</span><span class="p">[</span>
+            <span class="mi">0</span><span class="p">,</span>
+            <span class="mi">0</span><span class="p">,</span>
+            <span class="c1"># pivot-axis relationship:</span>
+            <span class="c1"># since the pivot is on the right and we want to open outward, set</span>
+            <span class="c1"># axis to positive</span>
+            <span class="mi">1</span><span class="p">,</span>  <span class="c1"># opening up</span>
+        <span class="p">],</span>  <span class="c1"># The cabinet door swings open and closed around the vertical axis,</span>
+        <span class="c1"># which is the z-axis.</span>
+        <span class="n">lower_angle_deg</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">upper_angle_deg</span><span class="o">=</span><span class="mi">90</span><span class="p">,</span>  <span class="c1"># open outward</span>
+        <span class="n">pivot_point</span><span class="o">=</span><span class="n">pivot_point</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">pred_robot</span>
+
+
+<span class="k">def</span> <span class="nf">partnet_41003</span><span class="p">(</span><span class="n">input_dir</span><span class="p">,</span> <span class="n">links</span><span class="p">,</span> <span class="n">joint_id</span><span class="o">=</span><span class="s2">&quot;joint_3&quot;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    No. masked_links: 6</span>
+<span class="sd">    Robot Link Summary:</span>
+<span class="sd">    - base</span>
+<span class="sd">    - door</span>
+<span class="sd">    - door_2</span>
+<span class="sd">    - door_3</span>
+<span class="sd">    - door_4</span>
+<span class="sd">    - furniture_body</span>
+
+<span class="sd">    Object: a cabinet with 4 doors</span>
+<span class="sd">    Targetted affordance: &quot;door_4&quot;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">pred_robot</span> <span class="o">=</span> <span class="n">Robot</span><span class="p">(</span><span class="n">input_dir</span><span class="o">=</span><span class="n">input_dir</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;cabinet&quot;</span><span class="p">)</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_link</span><span class="p">(</span><span class="n">links</span><span class="p">[</span><span class="s2">&quot;base&quot;</span><span class="p">])</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_link</span><span class="p">(</span><span class="n">links</span><span class="p">[</span><span class="s2">&quot;furniture_body&quot;</span><span class="p">])</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_joint</span><span class="p">(</span>
+        <span class="n">Joint</span><span class="p">(</span>
+            <span class="s2">&quot;base_to_furniture_body&quot;</span><span class="p">,</span>
+            <span class="n">Parent</span><span class="p">(</span><span class="s2">&quot;base&quot;</span><span class="p">),</span>
+            <span class="n">Child</span><span class="p">(</span><span class="s2">&quot;furniture_body&quot;</span><span class="p">),</span>
+            <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;fixed&quot;</span><span class="p">,</span>
+        <span class="p">),</span>
+    <span class="p">)</span>
+
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_link</span><span class="p">(</span><span class="n">links</span><span class="p">[</span><span class="s2">&quot;door&quot;</span><span class="p">])</span>
+    <span class="c1"># cabinet doors go in front of the furniture body.</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">place_relative_to</span><span class="p">(</span>
+        <span class="s2">&quot;door&quot;</span><span class="p">,</span> <span class="s2">&quot;furniture_body&quot;</span><span class="p">,</span> <span class="n">placement</span><span class="o">=</span><span class="s2">&quot;front&quot;</span><span class="p">,</span> <span class="n">clearance</span><span class="o">=</span><span class="mf">0.0</span>
+    <span class="p">)</span>
+
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_link</span><span class="p">(</span><span class="n">links</span><span class="p">[</span><span class="s2">&quot;door_2&quot;</span><span class="p">])</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">place_relative_to</span><span class="p">(</span>
+        <span class="s2">&quot;door_2&quot;</span><span class="p">,</span> <span class="s2">&quot;furniture_body&quot;</span><span class="p">,</span> <span class="n">placement</span><span class="o">=</span><span class="s2">&quot;front&quot;</span><span class="p">,</span> <span class="n">clearance</span><span class="o">=</span><span class="mf">0.0</span>
+    <span class="p">)</span>
+
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_link</span><span class="p">(</span><span class="n">links</span><span class="p">[</span><span class="s2">&quot;door_3&quot;</span><span class="p">])</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">place_relative_to</span><span class="p">(</span>
+        <span class="s2">&quot;door_3&quot;</span><span class="p">,</span> <span class="s2">&quot;furniture_body&quot;</span><span class="p">,</span> <span class="n">placement</span><span class="o">=</span><span class="s2">&quot;front&quot;</span><span class="p">,</span> <span class="n">clearance</span><span class="o">=</span><span class="mf">0.0</span>
+    <span class="p">)</span>
+
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_link</span><span class="p">(</span><span class="n">links</span><span class="p">[</span><span class="s2">&quot;door_4&quot;</span><span class="p">])</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">place_relative_to</span><span class="p">(</span>
+        <span class="s2">&quot;door_4&quot;</span><span class="p">,</span> <span class="s2">&quot;furniture_body&quot;</span><span class="p">,</span> <span class="n">placement</span><span class="o">=</span><span class="s2">&quot;front&quot;</span><span class="p">,</span> <span class="n">clearance</span><span class="o">=</span><span class="mf">0.0</span>
+    <span class="p">)</span>
+    <span class="c1"># ====================JOINT PREDICTION====================</span>
+    <span class="c1"># -- Groundtruth video analysis --</span>
+    <span class="c1"># in the groundtruth video, the top-left door opens up while its LEFT part of the door is still</span>
+    <span class="c1"># attached to the body so the pivot point needs to be Back-Left-Bottom (BLB)</span>
+    <span class="c1"># or Back-Left-Top (BLT)</span>
+    <span class="n">target_door_link</span> <span class="o">=</span> <span class="s2">&quot;door_4&quot;</span>
+    <span class="n">door_bb</span> <span class="o">=</span> <span class="n">pred_robot</span><span class="o">.</span><span class="n">get_bounding_boxes</span><span class="p">([</span><span class="n">target_door_link</span><span class="p">],</span> <span class="n">include_dim</span><span class="o">=</span><span class="kc">False</span><span class="p">)[</span>
+        <span class="n">target_door_link</span>
+    <span class="p">]</span>
+    <span class="n">door_vertices</span> <span class="o">=</span> <span class="n">compute_aabb_vertices</span><span class="p">(</span><span class="o">*</span><span class="n">door_bb</span><span class="p">)</span>
+    <span class="n">pivot_point</span> <span class="o">=</span> <span class="n">door_vertices</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># Back-Left-Bottom (BLB)</span>
+
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">make_revolute_joint</span><span class="p">(</span>
+        <span class="n">target_door_link</span><span class="p">,</span>
+        <span class="s2">&quot;furniture_body&quot;</span><span class="p">,</span>
+        <span class="n">global_axis</span><span class="o">=</span><span class="p">[</span>
+            <span class="mi">0</span><span class="p">,</span>
+            <span class="mi">0</span><span class="p">,</span>
+            <span class="c1"># pivot-axis relationship:</span>
+            <span class="c1"># since the pivot is on the left and we want to open outward, set</span>
+            <span class="c1"># axis to negative</span>
+            <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+        <span class="p">],</span>  <span class="c1"># The cabinet door swings open and closed around the vertical axis,</span>
+        <span class="c1"># which is the z-axis. Negative z-axis because the pivot point is on the left</span>
+        <span class="n">lower_angle_deg</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">upper_angle_deg</span><span class="o">=</span><span class="mi">90</span><span class="p">,</span>  <span class="c1"># open outward</span>
+        <span class="n">pivot_point</span><span class="o">=</span><span class="n">pivot_point</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">pred_robot</span>
+
+
+<span class="k">def</span> <span class="nf">partnet_46768</span><span class="p">(</span><span class="n">input_dir</span><span class="p">,</span> <span class="n">links</span><span class="p">,</span> <span class="n">joint_id</span><span class="o">=</span><span class="s2">&quot;joint_0&quot;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    No. masked_links: 4</span>
+<span class="sd">    Robot Link Summary:</span>
+<span class="sd">    - base</span>
+<span class="sd">    - door</span>
+<span class="sd">    - door_2</span>
+<span class="sd">    - furniture_body</span>
+
+<span class="sd">    Object: a cabinet with two sliding doors</span>
+<span class="sd">    Targetted affordance: &quot;door&quot;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">pred_robot</span> <span class="o">=</span> <span class="n">Robot</span><span class="p">(</span><span class="n">input_dir</span><span class="o">=</span><span class="n">input_dir</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;cabinet&quot;</span><span class="p">)</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_link</span><span class="p">(</span><span class="n">links</span><span class="p">[</span><span class="s2">&quot;base&quot;</span><span class="p">])</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_link</span><span class="p">(</span><span class="n">links</span><span class="p">[</span><span class="s2">&quot;furniture_body&quot;</span><span class="p">])</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_joint</span><span class="p">(</span>
+        <span class="n">Joint</span><span class="p">(</span>
+            <span class="s2">&quot;base_to_furniture_body&quot;</span><span class="p">,</span>
+            <span class="n">Parent</span><span class="p">(</span><span class="s2">&quot;base&quot;</span><span class="p">),</span>
+            <span class="n">Child</span><span class="p">(</span><span class="s2">&quot;furniture_body&quot;</span><span class="p">),</span>
+            <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;fixed&quot;</span><span class="p">,</span>
+        <span class="p">),</span>
+    <span class="p">)</span>
+
+    <span class="c1"># door 1</span>
+    <span class="n">door_link</span> <span class="o">=</span> <span class="s2">&quot;door&quot;</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_link</span><span class="p">(</span><span class="n">links</span><span class="p">[</span><span class="n">door_link</span><span class="p">])</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">place_relative_to</span><span class="p">(</span>
+        <span class="n">door_link</span><span class="p">,</span> <span class="s2">&quot;furniture_body&quot;</span><span class="p">,</span> <span class="n">placement</span><span class="o">=</span><span class="s2">&quot;inside&quot;</span><span class="p">,</span> <span class="n">clearance</span><span class="o">=</span><span class="mf">0.0</span>
+    <span class="p">)</span>
+
+    <span class="c1"># door 2</span>
+    <span class="n">door_link</span> <span class="o">=</span> <span class="s2">&quot;door_2&quot;</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_link</span><span class="p">(</span><span class="n">links</span><span class="p">[</span><span class="n">door_link</span><span class="p">])</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">place_relative_to</span><span class="p">(</span>
+        <span class="n">door_link</span><span class="p">,</span> <span class="s2">&quot;furniture_body&quot;</span><span class="p">,</span> <span class="n">placement</span><span class="o">=</span><span class="s2">&quot;inside&quot;</span><span class="p">,</span> <span class="n">clearance</span><span class="o">=</span><span class="mf">0.0</span>
+    <span class="p">)</span>
+
+    <span class="c1"># ====================JOINT PREDICTION====================</span>
+    <span class="n">target_door_link</span> <span class="o">=</span> <span class="s2">&quot;door&quot;</span>
+    <span class="n">lower_point</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="n">bbox</span> <span class="o">=</span> <span class="n">pred_robot</span><span class="o">.</span><span class="n">get_bounding_boxes</span><span class="p">([</span><span class="n">target_door_link</span><span class="p">],</span> <span class="n">include_dim</span><span class="o">=</span><span class="kc">True</span><span class="p">)[</span>
+        <span class="n">target_door_link</span>
+    <span class="p">]</span>
+    <span class="n">bbox_dim</span> <span class="o">=</span> <span class="n">bbox</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">upper_point</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="mi">0</span><span class="p">,</span>
+        <span class="o">-</span><span class="n">bbox_dim</span><span class="p">[</span><span class="s2">&quot;width&quot;</span><span class="p">],</span>
+        <span class="mi">0</span><span class="p">,</span>
+    <span class="p">]</span>  <span class="c1"># this door slides left and right along the y-axis</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">make_prismatic_joint</span><span class="p">(</span>
+        <span class="n">target_door_link</span><span class="p">,</span> <span class="s2">&quot;furniture_body&quot;</span><span class="p">,</span> <span class="n">lower_point</span><span class="p">,</span> <span class="n">upper_point</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">pred_robot</span>
+
+
+<span class="k">def</span> <span class="nf">partnet_44817</span><span class="p">(</span><span class="n">input_dir</span><span class="p">,</span> <span class="n">links</span><span class="p">,</span> <span class="n">joint_id</span><span class="o">=</span><span class="s2">&quot;joint_2&quot;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    No. masked_links: 6</span>
+<span class="sd">    Robot Link Summary:</span>
+<span class="sd">    - base</span>
+<span class="sd">    - drawer</span>
+<span class="sd">    - drawer_2</span>
+<span class="sd">    - drawer_3</span>
+<span class="sd">    - drawer_4</span>
+<span class="sd">    - furniture_body</span>
+
+<span class="sd">    Object: a chest of drawers with 4 drawers</span>
+<span class="sd">    Targetted afffordance: &quot;drawer_3&quot;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">pred_robot</span> <span class="o">=</span> <span class="n">Robot</span><span class="p">(</span><span class="n">input_dir</span><span class="o">=</span><span class="n">input_dir</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;chest_of_drawers&quot;</span><span class="p">)</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_link</span><span class="p">(</span><span class="n">links</span><span class="p">[</span><span class="s2">&quot;base&quot;</span><span class="p">])</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_link</span><span class="p">(</span><span class="n">links</span><span class="p">[</span><span class="s2">&quot;furniture_body&quot;</span><span class="p">])</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_joint</span><span class="p">(</span>
+        <span class="n">Joint</span><span class="p">(</span>
+            <span class="s2">&quot;base_to_furniture_body&quot;</span><span class="p">,</span>
+            <span class="n">Parent</span><span class="p">(</span><span class="s2">&quot;base&quot;</span><span class="p">),</span>
+            <span class="n">Child</span><span class="p">(</span><span class="s2">&quot;furniture_body&quot;</span><span class="p">),</span>
+            <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;fixed&quot;</span><span class="p">,</span>
+        <span class="p">),</span>
+    <span class="p">)</span>
+
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_link</span><span class="p">(</span><span class="n">links</span><span class="p">[</span><span class="s2">&quot;drawer&quot;</span><span class="p">])</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">place_relative_to</span><span class="p">(</span>
+        <span class="s2">&quot;drawer&quot;</span><span class="p">,</span> <span class="s2">&quot;furniture_body&quot;</span><span class="p">,</span> <span class="n">placement</span><span class="o">=</span><span class="s2">&quot;inside&quot;</span><span class="p">,</span> <span class="n">clearance</span><span class="o">=</span><span class="mf">0.0</span>
+    <span class="p">)</span>
+    <span class="c1"># ========================================================</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_link</span><span class="p">(</span><span class="n">links</span><span class="p">[</span><span class="s2">&quot;drawer_2&quot;</span><span class="p">])</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">place_relative_to</span><span class="p">(</span>
+        <span class="s2">&quot;drawer_2&quot;</span><span class="p">,</span> <span class="s2">&quot;furniture_body&quot;</span><span class="p">,</span> <span class="n">placement</span><span class="o">=</span><span class="s2">&quot;inside&quot;</span><span class="p">,</span> <span class="n">clearance</span><span class="o">=</span><span class="mf">0.0</span>
+    <span class="p">)</span>
+    <span class="c1"># ========================================================</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_link</span><span class="p">(</span><span class="n">links</span><span class="p">[</span><span class="s2">&quot;drawer_3&quot;</span><span class="p">])</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">place_relative_to</span><span class="p">(</span>
+        <span class="s2">&quot;drawer_3&quot;</span><span class="p">,</span> <span class="s2">&quot;furniture_body&quot;</span><span class="p">,</span> <span class="n">placement</span><span class="o">=</span><span class="s2">&quot;inside&quot;</span><span class="p">,</span> <span class="n">clearance</span><span class="o">=</span><span class="mf">0.0</span>
+    <span class="p">)</span>
+    <span class="c1"># ========================================================</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_link</span><span class="p">(</span><span class="n">links</span><span class="p">[</span><span class="s2">&quot;drawer_4&quot;</span><span class="p">])</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">place_relative_to</span><span class="p">(</span>
+        <span class="s2">&quot;drawer_4&quot;</span><span class="p">,</span> <span class="s2">&quot;furniture_body&quot;</span><span class="p">,</span> <span class="n">placement</span><span class="o">=</span><span class="s2">&quot;inside&quot;</span><span class="p">,</span> <span class="n">clearance</span><span class="o">=</span><span class="mf">0.0</span>
+    <span class="p">)</span>
+    <span class="c1"># ====================JOINT PREDICTION====================</span>
+    <span class="n">target_drawer_link</span> <span class="o">=</span> <span class="s2">&quot;drawer_3&quot;</span>
+    <span class="n">lower_point</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="mi">0</span><span class="p">,</span>
+        <span class="mi">0</span><span class="p">,</span>
+        <span class="mi">0</span><span class="p">,</span>
+    <span class="p">]</span>  <span class="c1"># the drawer is fully retracted. At the same pos (hide in the box) ## TUNABLE</span>
+    <span class="n">bbox</span> <span class="o">=</span> <span class="n">pred_robot</span><span class="o">.</span><span class="n">get_bounding_boxes</span><span class="p">(</span>
+        <span class="p">[</span><span class="n">target_drawer_link</span><span class="p">],</span> <span class="n">include_dim</span><span class="o">=</span><span class="kc">True</span>
+    <span class="p">)</span>  <span class="c1"># get all bounding boxes for all links</span>
+
+    <span class="n">bbox_dim</span> <span class="o">=</span> <span class="n">bbox</span><span class="p">[</span><span class="n">target_drawer_link</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">upper_point</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">bbox_dim</span><span class="p">[</span><span class="s2">&quot;length&quot;</span><span class="p">],</span>
+        <span class="mi">0</span><span class="p">,</span>
+        <span class="mi">0</span><span class="p">,</span>
+    <span class="p">]</span>  <span class="c1"># the drawer is fully extended. At the same pos as the drawer_width ## TUNABLE</span>
+    <span class="c1"># the drawer slides forward and backward so x-axis</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">make_prismatic_joint</span><span class="p">(</span>
+        <span class="n">target_drawer_link</span><span class="p">,</span> <span class="s2">&quot;furniture_body&quot;</span><span class="p">,</span> <span class="n">lower_point</span><span class="p">,</span> <span class="n">upper_point</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">pred_robot</span>
+
+
+<span class="k">def</span> <span class="nf">partnet_103619</span><span class="p">(</span><span class="n">input_dir</span><span class="p">,</span> <span class="n">links</span><span class="p">,</span> <span class="n">joint_id</span><span class="o">=</span><span class="s2">&quot;joint_3&quot;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    No. masked_links: 4</span>
+<span class="sd">    Robot Link Summary:</span>
+<span class="sd">    - base</span>
+<span class="sd">    - handle</span>
+<span class="sd">    - dispenser_body</span>
+<span class="sd">    - lid</span>
+
+<span class="sd">    Object: a dispenser bottle</span>
+<span class="sd">    Targetted affordance: &quot;lid&quot; can be lifted up</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">pred_robot</span> <span class="o">=</span> <span class="n">Robot</span><span class="p">(</span><span class="n">input_dir</span><span class="o">=</span><span class="n">input_dir</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;dispenser_bottle&quot;</span><span class="p">)</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_link</span><span class="p">(</span><span class="n">links</span><span class="p">[</span><span class="s2">&quot;base&quot;</span><span class="p">])</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_link</span><span class="p">(</span><span class="n">links</span><span class="p">[</span><span class="s2">&quot;dispenser_body&quot;</span><span class="p">])</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_joint</span><span class="p">(</span>
+        <span class="n">Joint</span><span class="p">(</span>
+            <span class="s2">&quot;base_to_dispenser_body&quot;</span><span class="p">,</span>
+            <span class="n">Parent</span><span class="p">(</span><span class="s2">&quot;base&quot;</span><span class="p">),</span>
+            <span class="n">Child</span><span class="p">(</span><span class="s2">&quot;dispenser_body&quot;</span><span class="p">),</span>
+            <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;fixed&quot;</span><span class="p">,</span>
+        <span class="p">),</span>
+    <span class="p">)</span>
+
+    <span class="c1"># lid goes on top of the dispenser_body. No clearance or further adjustment needed</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_link</span><span class="p">(</span><span class="n">links</span><span class="p">[</span><span class="s2">&quot;lid&quot;</span><span class="p">])</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">place_relative_to</span><span class="p">(</span>
+        <span class="s2">&quot;lid&quot;</span><span class="p">,</span> <span class="s2">&quot;dispenser_body&quot;</span><span class="p">,</span> <span class="n">placement</span><span class="o">=</span><span class="s2">&quot;above&quot;</span><span class="p">,</span> <span class="n">clearance</span><span class="o">=</span><span class="mf">0.0</span>
+    <span class="p">)</span>
+    <span class="c1"># handle goes on top of the dispenser_body. No clearance or further adjustment needed</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_link</span><span class="p">(</span><span class="n">links</span><span class="p">[</span><span class="s2">&quot;handle&quot;</span><span class="p">])</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">place_relative_to</span><span class="p">(</span>
+        <span class="s2">&quot;handle&quot;</span><span class="p">,</span> <span class="s2">&quot;dispenser_body&quot;</span><span class="p">,</span> <span class="n">placement</span><span class="o">=</span><span class="s2">&quot;above&quot;</span><span class="p">,</span> <span class="n">clearance</span><span class="o">=</span><span class="mf">0.0</span>
+    <span class="p">)</span>
+    <span class="c1"># ====================JOINT PREDICTION====================</span>
+
+    <span class="c1"># this lid moves along z-axis</span>
+    <span class="n">lower_point</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="c1"># the lid move a very small amount up ## TUNABLE</span>
+    <span class="n">upper_point</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">0.025</span><span class="p">]</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">make_prismatic_joint</span><span class="p">(</span>
+        <span class="s2">&quot;lid&quot;</span><span class="p">,</span> <span class="s2">&quot;dispenser_body&quot;</span><span class="p">,</span> <span class="n">lower_point</span><span class="p">,</span> <span class="n">upper_point</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">pred_robot</span>
+
+
+<span class="k">def</span> <span class="nf">partnet_103619</span><span class="p">(</span><span class="n">input_dir</span><span class="p">,</span> <span class="n">links</span><span class="p">,</span> <span class="n">joint_id</span><span class="o">=</span><span class="s2">&quot;joint_0&quot;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    No. masked_links: 4</span>
+<span class="sd">    Robot Link Summary:</span>
+<span class="sd">    - base</span>
+<span class="sd">    - handle</span>
+<span class="sd">    - dispenser_body</span>
+<span class="sd">    - lid</span>
+
+<span class="sd">    Object: a dispenser bottle</span>
+<span class="sd">    Targetted affordance: &quot;handle&quot; can be twisted to dispense liquid by rotating</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">pred_robot</span> <span class="o">=</span> <span class="n">Robot</span><span class="p">(</span><span class="n">input_dir</span><span class="o">=</span><span class="n">input_dir</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;dispenser_bottle&quot;</span><span class="p">)</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_link</span><span class="p">(</span><span class="n">links</span><span class="p">[</span><span class="s2">&quot;base&quot;</span><span class="p">])</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_link</span><span class="p">(</span><span class="n">links</span><span class="p">[</span><span class="s2">&quot;dispenser_body&quot;</span><span class="p">])</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_joint</span><span class="p">(</span>
+        <span class="n">Joint</span><span class="p">(</span>
+            <span class="s2">&quot;base_to_dispenser_body&quot;</span><span class="p">,</span>
+            <span class="n">Parent</span><span class="p">(</span><span class="s2">&quot;base&quot;</span><span class="p">),</span>
+            <span class="n">Child</span><span class="p">(</span><span class="s2">&quot;dispenser_body&quot;</span><span class="p">),</span>
+            <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;fixed&quot;</span><span class="p">,</span>
+        <span class="p">),</span>
+    <span class="p">)</span>
+
+    <span class="c1"># lid goes on top of the dispenser_body. No clearance or further adjustment needed</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_link</span><span class="p">(</span><span class="n">links</span><span class="p">[</span><span class="s2">&quot;lid&quot;</span><span class="p">])</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">place_relative_to</span><span class="p">(</span>
+        <span class="s2">&quot;lid&quot;</span><span class="p">,</span> <span class="s2">&quot;dispenser_body&quot;</span><span class="p">,</span> <span class="n">placement</span><span class="o">=</span><span class="s2">&quot;above&quot;</span><span class="p">,</span> <span class="n">clearance</span><span class="o">=</span><span class="mf">0.0</span>
+    <span class="p">)</span>
+    <span class="c1"># handle goes on top of the dispenser_body. No clearance or further adjustment needed</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_link</span><span class="p">(</span><span class="n">links</span><span class="p">[</span><span class="s2">&quot;handle&quot;</span><span class="p">])</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">place_relative_to</span><span class="p">(</span>
+        <span class="s2">&quot;handle&quot;</span><span class="p">,</span> <span class="s2">&quot;dispenser_body&quot;</span><span class="p">,</span> <span class="n">placement</span><span class="o">=</span><span class="s2">&quot;above&quot;</span><span class="p">,</span> <span class="n">clearance</span><span class="o">=</span><span class="mf">0.0</span>
+    <span class="p">)</span>
+    <span class="c1"># ====================JOINT PREDICTION====================</span>
+    <span class="c1"># -- Groundtruth video analysis --</span>
+    <span class="c1"># in the groundtruth video, the handle rotates up and down while its TOP part still</span>
+    <span class="c1"># attached to the lid so the pivot point needs to be Back-Right-Top (BRT) or Back-Left-Top (BLT)</span>
+
+    <span class="n">lid_bb</span> <span class="o">=</span> <span class="n">pred_robot</span><span class="o">.</span><span class="n">get_bounding_boxes</span><span class="p">(</span>
+        <span class="p">[</span><span class="s2">&quot;handle&quot;</span><span class="p">],</span> <span class="n">include_dim</span><span class="o">=</span><span class="kc">False</span><span class="p">)[</span><span class="s2">&quot;handle&quot;</span><span class="p">]</span>
+    <span class="n">lid_vertices</span> <span class="o">=</span> <span class="n">compute_aabb_vertices</span><span class="p">(</span><span class="o">*</span><span class="n">lid_bb</span><span class="p">)</span>
+    <span class="n">pivot_point</span> <span class="o">=</span> <span class="n">lid_vertices</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span>  <span class="c1"># Back-Right-Top (BRT)</span>
+
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">make_revolute_joint</span><span class="p">(</span>
+        <span class="s2">&quot;handle&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;dispenser_body&quot;</span><span class="p">,</span>
+        <span class="n">global_axis</span><span class="o">=</span><span class="p">[</span>
+            <span class="mi">0</span><span class="p">,</span>
+            <span class="c1"># pivot-axis relationship:</span>
+            <span class="c1"># the handle is squeezed in (i.e. open inward) and the pivot is on the top.</span>
+            <span class="c1"># so set the axis to positive</span>
+            <span class="mi">1</span><span class="p">,</span>
+            <span class="mi">0</span><span class="p">,</span>
+        <span class="p">],</span>  <span class="c1"># the handle twists open and close, so rotates along the left-right axis,</span>
+        <span class="n">lower_angle_deg</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">upper_angle_deg</span><span class="o">=</span><span class="mi">45</span><span class="p">,</span>  <span class="c1"># slightly open inward</span>
+        <span class="n">pivot_point</span><span class="o">=</span><span class="n">pivot_point</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">pred_robot</span>
+
+
+<span class="k">def</span> <span class="nf">partnet_102318</span><span class="p">(</span><span class="n">input_dir</span><span class="p">,</span> <span class="n">links</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    No. masked_links: 17</span>
+<span class="sd">    Robot Link Summary:</span>
+<span class="sd">    - base</span>
+<span class="sd">    - door</span>
+<span class="sd">    - button</span>
+<span class="sd">    - button_2</span>
+<span class="sd">    - button_3</span>
+<span class="sd">    - button_4</span>
+<span class="sd">    - button_5</span>
+<span class="sd">    - button_6</span>
+<span class="sd">    - button_7</span>
+<span class="sd">    - button_8</span>
+<span class="sd">    - button_9</span>
+<span class="sd">    - button_10</span>
+<span class="sd">    - button_11</span>
+<span class="sd">    - button_12</span>
+<span class="sd">    - knob</span>
+<span class="sd">    - safe_body</span>
+
+
+<span class="sd">    Object: a safe with a door, a knob, and buttons</span>
+<span class="sd">    Affordance: buttons can be pushed</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">pred_robot</span> <span class="o">=</span> <span class="n">Robot</span><span class="p">(</span><span class="n">input_dir</span><span class="o">=</span><span class="n">input_dir</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;safe&quot;</span><span class="p">)</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_link</span><span class="p">(</span><span class="n">links</span><span class="p">[</span><span class="s2">&quot;base&quot;</span><span class="p">])</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_link</span><span class="p">(</span><span class="n">links</span><span class="p">[</span><span class="s2">&quot;safe_body&quot;</span><span class="p">])</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_joint</span><span class="p">(</span>
+        <span class="n">Joint</span><span class="p">(</span><span class="s2">&quot;base_to_safe_body&quot;</span><span class="p">,</span> <span class="n">Parent</span><span class="p">(</span><span class="s2">&quot;base&quot;</span><span class="p">),</span>
+              <span class="n">Child</span><span class="p">(</span><span class="s2">&quot;safe_body&quot;</span><span class="p">),</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;fixed&quot;</span><span class="p">),</span>
+    <span class="p">)</span>
+
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_link</span><span class="p">(</span><span class="n">links</span><span class="p">[</span><span class="s2">&quot;door&quot;</span><span class="p">])</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">place_relative_to</span><span class="p">(</span>
+        <span class="s2">&quot;door&quot;</span><span class="p">,</span> <span class="s2">&quot;safe_body&quot;</span><span class="p">,</span> <span class="n">placement</span><span class="o">=</span><span class="s2">&quot;front&quot;</span><span class="p">,</span> <span class="n">clearance</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_link</span><span class="p">(</span><span class="n">links</span><span class="p">[</span><span class="s2">&quot;knob&quot;</span><span class="p">])</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">place_relative_to</span><span class="p">(</span>
+        <span class="s2">&quot;knob&quot;</span><span class="p">,</span> <span class="s2">&quot;door&quot;</span><span class="p">,</span> <span class="n">placement</span><span class="o">=</span><span class="s2">&quot;front&quot;</span><span class="p">,</span> <span class="n">clearance</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_link</span><span class="p">(</span><span class="n">links</span><span class="p">[</span><span class="s2">&quot;button&quot;</span><span class="p">])</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">place_relative_to</span><span class="p">(</span>
+        <span class="s2">&quot;button&quot;</span><span class="p">,</span> <span class="s2">&quot;door&quot;</span><span class="p">,</span> <span class="n">placement</span><span class="o">=</span><span class="s2">&quot;front&quot;</span><span class="p">,</span> <span class="n">clearance</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_link</span><span class="p">(</span><span class="n">links</span><span class="p">[</span><span class="s2">&quot;button_2&quot;</span><span class="p">])</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">place_relative_to</span><span class="p">(</span>
+        <span class="s2">&quot;button_2&quot;</span><span class="p">,</span> <span class="s2">&quot;door&quot;</span><span class="p">,</span> <span class="n">placement</span><span class="o">=</span><span class="s2">&quot;front&quot;</span><span class="p">,</span> <span class="n">clearance</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_link</span><span class="p">(</span><span class="n">links</span><span class="p">[</span><span class="s2">&quot;button_3&quot;</span><span class="p">])</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">place_relative_to</span><span class="p">(</span>
+        <span class="s2">&quot;button_3&quot;</span><span class="p">,</span> <span class="s2">&quot;door&quot;</span><span class="p">,</span> <span class="n">placement</span><span class="o">=</span><span class="s2">&quot;front&quot;</span><span class="p">,</span> <span class="n">clearance</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_link</span><span class="p">(</span><span class="n">links</span><span class="p">[</span><span class="s2">&quot;button_4&quot;</span><span class="p">])</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">place_relative_to</span><span class="p">(</span>
+        <span class="s2">&quot;button_4&quot;</span><span class="p">,</span> <span class="s2">&quot;door&quot;</span><span class="p">,</span> <span class="n">placement</span><span class="o">=</span><span class="s2">&quot;front&quot;</span><span class="p">,</span> <span class="n">clearance</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_link</span><span class="p">(</span><span class="n">links</span><span class="p">[</span><span class="s2">&quot;button_5&quot;</span><span class="p">])</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">place_relative_to</span><span class="p">(</span>
+        <span class="s2">&quot;button_5&quot;</span><span class="p">,</span> <span class="s2">&quot;door&quot;</span><span class="p">,</span> <span class="n">placement</span><span class="o">=</span><span class="s2">&quot;front&quot;</span><span class="p">,</span> <span class="n">clearance</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_link</span><span class="p">(</span><span class="n">links</span><span class="p">[</span><span class="s2">&quot;button_6&quot;</span><span class="p">])</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">place_relative_to</span><span class="p">(</span>
+        <span class="s2">&quot;button_6&quot;</span><span class="p">,</span> <span class="s2">&quot;door&quot;</span><span class="p">,</span> <span class="n">placement</span><span class="o">=</span><span class="s2">&quot;front&quot;</span><span class="p">,</span> <span class="n">clearance</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_link</span><span class="p">(</span><span class="n">links</span><span class="p">[</span><span class="s2">&quot;button_7&quot;</span><span class="p">])</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">place_relative_to</span><span class="p">(</span>
+        <span class="s2">&quot;button_7&quot;</span><span class="p">,</span> <span class="s2">&quot;door&quot;</span><span class="p">,</span> <span class="n">placement</span><span class="o">=</span><span class="s2">&quot;front&quot;</span><span class="p">,</span> <span class="n">clearance</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_link</span><span class="p">(</span><span class="n">links</span><span class="p">[</span><span class="s2">&quot;button_8&quot;</span><span class="p">])</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">place_relative_to</span><span class="p">(</span>
+        <span class="s2">&quot;button_8&quot;</span><span class="p">,</span> <span class="s2">&quot;door&quot;</span><span class="p">,</span> <span class="n">placement</span><span class="o">=</span><span class="s2">&quot;front&quot;</span><span class="p">,</span> <span class="n">clearance</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_link</span><span class="p">(</span><span class="n">links</span><span class="p">[</span><span class="s2">&quot;button_9&quot;</span><span class="p">])</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">place_relative_to</span><span class="p">(</span>
+        <span class="s2">&quot;button_9&quot;</span><span class="p">,</span> <span class="s2">&quot;door&quot;</span><span class="p">,</span> <span class="n">placement</span><span class="o">=</span><span class="s2">&quot;front&quot;</span><span class="p">,</span> <span class="n">clearance</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_link</span><span class="p">(</span><span class="n">links</span><span class="p">[</span><span class="s2">&quot;button_10&quot;</span><span class="p">])</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">place_relative_to</span><span class="p">(</span>
+        <span class="s2">&quot;button_10&quot;</span><span class="p">,</span> <span class="s2">&quot;door&quot;</span><span class="p">,</span> <span class="n">placement</span><span class="o">=</span><span class="s2">&quot;front&quot;</span><span class="p">,</span> <span class="n">clearance</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_link</span><span class="p">(</span><span class="n">links</span><span class="p">[</span><span class="s2">&quot;button_11&quot;</span><span class="p">])</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">place_relative_to</span><span class="p">(</span>
+        <span class="s2">&quot;button_11&quot;</span><span class="p">,</span> <span class="s2">&quot;door&quot;</span><span class="p">,</span> <span class="n">placement</span><span class="o">=</span><span class="s2">&quot;front&quot;</span><span class="p">,</span> <span class="n">clearance</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_link</span><span class="p">(</span><span class="n">links</span><span class="p">[</span><span class="s2">&quot;button_12&quot;</span><span class="p">])</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">place_relative_to</span><span class="p">(</span>
+        <span class="s2">&quot;button_12&quot;</span><span class="p">,</span> <span class="s2">&quot;door&quot;</span><span class="p">,</span> <span class="n">placement</span><span class="o">=</span><span class="s2">&quot;front&quot;</span><span class="p">,</span> <span class="n">clearance</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
+
+    <span class="c1"># # ====================JOINT PREDICTION====================</span>
+    <span class="n">pushing_direction</span> <span class="o">=</span> <span class="n">pred_robot</span><span class="o">.</span><span class="n">compute_push_direction</span><span class="p">(</span><span class="s2">&quot;button&quot;</span><span class="p">)</span>  <span class="c1"># compute</span>
+    <span class="c1"># the normal vector to the button mesh, which is the pushing direction</span>
+    <span class="n">num_buttons</span> <span class="o">=</span> <span class="mi">12</span>
+    <span class="k">for</span> <span class="n">link_idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_buttons</span><span class="p">):</span>
+        <span class="n">link</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;button&quot;</span> <span class="k">if</span> <span class="n">link_idx</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="sa">f</span><span class="s2">&quot;button_</span><span class="si">{</span><span class="n">link_idx</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">lower_point</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+        <span class="n">pred_robot</span><span class="o">.</span><span class="n">make_prismatic_joint</span><span class="p">(</span>
+            <span class="n">link</span><span class="p">,</span> <span class="s2">&quot;door&quot;</span><span class="p">,</span> <span class="n">lower_point</span><span class="p">,</span> <span class="n">pushing_direction</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">pred_robot</span>
+
+
+<span class="k">def</span> <span class="nf">partnet_36280</span><span class="p">(</span><span class="n">input_dir</span><span class="p">,</span> <span class="n">links</span><span class="p">,</span> <span class="n">joint_id</span><span class="o">=</span><span class="s2">&quot;joint_17&quot;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    No. masked_links: 18</span>
+<span class="sd">    Robot Link Summary:</span>
+<span class="sd">    - base</span>
+<span class="sd">    - caster</span>
+<span class="sd">    - wheel</span>
+<span class="sd">    - wheel_2</span>
+<span class="sd">    - caster_2</span>
+<span class="sd">    - wheel_3</span>
+<span class="sd">    - wheel_4</span>
+<span class="sd">    - caster_3</span>
+<span class="sd">    - wheel_5</span>
+<span class="sd">    - wheel_6</span>
+<span class="sd">    - caster_4</span>
+<span class="sd">    - wheel_7</span>
+<span class="sd">    - wheel_8</span>
+<span class="sd">    - caster_5</span>
+<span class="sd">    - wheel_9</span>
+<span class="sd">    - wheel_10</span>
+<span class="sd">    - seat</span>
+<span class="sd">    - chair_leg</span>
+
+
+<span class="sd">    Object: an office chair</span>
+<span class="sd">    Targetted affordance: &quot;seat&quot; can be pushed down</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">pred_robot</span> <span class="o">=</span> <span class="n">Robot</span><span class="p">(</span><span class="n">input_dir</span><span class="o">=</span><span class="n">input_dir</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;office_chair&quot;</span><span class="p">)</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_link</span><span class="p">(</span><span class="n">links</span><span class="p">[</span><span class="s2">&quot;base&quot;</span><span class="p">])</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_link</span><span class="p">(</span><span class="n">links</span><span class="p">[</span><span class="s2">&quot;chair_leg&quot;</span><span class="p">])</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_joint</span><span class="p">(</span>
+        <span class="n">Joint</span><span class="p">(</span><span class="s2">&quot;base_to_chair_leg&quot;</span><span class="p">,</span> <span class="n">Parent</span><span class="p">(</span><span class="s2">&quot;base&quot;</span><span class="p">),</span>
+              <span class="n">Child</span><span class="p">(</span><span class="s2">&quot;chair_leg&quot;</span><span class="p">),</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;fixed&quot;</span><span class="p">),</span>
+    <span class="p">)</span>
+
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_link</span><span class="p">(</span><span class="n">links</span><span class="p">[</span><span class="s2">&quot;seat&quot;</span><span class="p">])</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">place_relative_to</span><span class="p">(</span>
+        <span class="s2">&quot;seat&quot;</span><span class="p">,</span> <span class="s2">&quot;chair_leg&quot;</span><span class="p">,</span> <span class="n">placement</span><span class="o">=</span><span class="s2">&quot;above&quot;</span><span class="p">,</span> <span class="n">clearance</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_link</span><span class="p">(</span><span class="n">links</span><span class="p">[</span><span class="s2">&quot;caster&quot;</span><span class="p">])</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">place_relative_to</span><span class="p">(</span>
+        <span class="s2">&quot;caster&quot;</span><span class="p">,</span> <span class="s2">&quot;chair_leg&quot;</span><span class="p">,</span> <span class="n">placement</span><span class="o">=</span><span class="s2">&quot;below&quot;</span><span class="p">,</span> <span class="n">clearance</span><span class="o">=</span><span class="mf">0.0</span>
+    <span class="p">)</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_link</span><span class="p">(</span><span class="n">links</span><span class="p">[</span><span class="s2">&quot;wheel&quot;</span><span class="p">])</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">place_relative_to</span><span class="p">(</span>
+        <span class="s2">&quot;wheel&quot;</span><span class="p">,</span> <span class="s2">&quot;caster&quot;</span><span class="p">,</span> <span class="n">placement</span><span class="o">=</span><span class="s2">&quot;below&quot;</span><span class="p">,</span> <span class="n">clearance</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_link</span><span class="p">(</span><span class="n">links</span><span class="p">[</span><span class="s2">&quot;wheel_2&quot;</span><span class="p">])</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">place_relative_to</span><span class="p">(</span>
+        <span class="s2">&quot;wheel_2&quot;</span><span class="p">,</span> <span class="s2">&quot;caster&quot;</span><span class="p">,</span> <span class="n">placement</span><span class="o">=</span><span class="s2">&quot;below&quot;</span><span class="p">,</span> <span class="n">clearance</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_link</span><span class="p">(</span><span class="n">links</span><span class="p">[</span><span class="s2">&quot;caster_2&quot;</span><span class="p">])</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">place_relative_to</span><span class="p">(</span>
+        <span class="s2">&quot;caster_2&quot;</span><span class="p">,</span> <span class="s2">&quot;chair_leg&quot;</span><span class="p">,</span> <span class="n">placement</span><span class="o">=</span><span class="s2">&quot;below&quot;</span><span class="p">,</span> <span class="n">clearance</span><span class="o">=</span><span class="mf">0.0</span>
+    <span class="p">)</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_link</span><span class="p">(</span><span class="n">links</span><span class="p">[</span><span class="s2">&quot;wheel_3&quot;</span><span class="p">])</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">place_relative_to</span><span class="p">(</span>
+        <span class="s2">&quot;wheel_3&quot;</span><span class="p">,</span> <span class="s2">&quot;caster_2&quot;</span><span class="p">,</span> <span class="n">placement</span><span class="o">=</span><span class="s2">&quot;below&quot;</span><span class="p">,</span> <span class="n">clearance</span><span class="o">=</span><span class="mf">0.0</span>
+    <span class="p">)</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_link</span><span class="p">(</span><span class="n">links</span><span class="p">[</span><span class="s2">&quot;wheel_4&quot;</span><span class="p">])</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">place_relative_to</span><span class="p">(</span>
+        <span class="s2">&quot;wheel_4&quot;</span><span class="p">,</span> <span class="s2">&quot;caster_2&quot;</span><span class="p">,</span> <span class="n">placement</span><span class="o">=</span><span class="s2">&quot;below&quot;</span><span class="p">,</span> <span class="n">clearance</span><span class="o">=</span><span class="mf">0.0</span>
+    <span class="p">)</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_link</span><span class="p">(</span><span class="n">links</span><span class="p">[</span><span class="s2">&quot;caster_3&quot;</span><span class="p">])</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">place_relative_to</span><span class="p">(</span>
+        <span class="s2">&quot;caster_3&quot;</span><span class="p">,</span> <span class="s2">&quot;chair_leg&quot;</span><span class="p">,</span> <span class="n">placement</span><span class="o">=</span><span class="s2">&quot;below&quot;</span><span class="p">,</span> <span class="n">clearance</span><span class="o">=</span><span class="mf">0.0</span>
+    <span class="p">)</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_link</span><span class="p">(</span><span class="n">links</span><span class="p">[</span><span class="s2">&quot;wheel_5&quot;</span><span class="p">])</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">place_relative_to</span><span class="p">(</span>
+        <span class="s2">&quot;wheel_5&quot;</span><span class="p">,</span> <span class="s2">&quot;caster_3&quot;</span><span class="p">,</span> <span class="n">placement</span><span class="o">=</span><span class="s2">&quot;below&quot;</span><span class="p">,</span> <span class="n">clearance</span><span class="o">=</span><span class="mf">0.0</span>
+    <span class="p">)</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_link</span><span class="p">(</span><span class="n">links</span><span class="p">[</span><span class="s2">&quot;wheel_6&quot;</span><span class="p">])</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">place_relative_to</span><span class="p">(</span>
+        <span class="s2">&quot;wheel_6&quot;</span><span class="p">,</span> <span class="s2">&quot;caster_3&quot;</span><span class="p">,</span> <span class="n">placement</span><span class="o">=</span><span class="s2">&quot;below&quot;</span><span class="p">,</span> <span class="n">clearance</span><span class="o">=</span><span class="mf">0.0</span>
+    <span class="p">)</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_link</span><span class="p">(</span><span class="n">links</span><span class="p">[</span><span class="s2">&quot;caster_4&quot;</span><span class="p">])</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">place_relative_to</span><span class="p">(</span>
+        <span class="s2">&quot;caster_4&quot;</span><span class="p">,</span> <span class="s2">&quot;chair_leg&quot;</span><span class="p">,</span> <span class="n">placement</span><span class="o">=</span><span class="s2">&quot;below&quot;</span><span class="p">,</span> <span class="n">clearance</span><span class="o">=</span><span class="mf">0.0</span>
+    <span class="p">)</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_link</span><span class="p">(</span><span class="n">links</span><span class="p">[</span><span class="s2">&quot;wheel_7&quot;</span><span class="p">])</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">place_relative_to</span><span class="p">(</span>
+        <span class="s2">&quot;wheel_7&quot;</span><span class="p">,</span> <span class="s2">&quot;caster_4&quot;</span><span class="p">,</span> <span class="n">placement</span><span class="o">=</span><span class="s2">&quot;below&quot;</span><span class="p">,</span> <span class="n">clearance</span><span class="o">=</span><span class="mf">0.0</span>
+    <span class="p">)</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_link</span><span class="p">(</span><span class="n">links</span><span class="p">[</span><span class="s2">&quot;wheel_8&quot;</span><span class="p">])</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">place_relative_to</span><span class="p">(</span>
+        <span class="s2">&quot;wheel_8&quot;</span><span class="p">,</span> <span class="s2">&quot;caster_4&quot;</span><span class="p">,</span> <span class="n">placement</span><span class="o">=</span><span class="s2">&quot;below&quot;</span><span class="p">,</span> <span class="n">clearance</span><span class="o">=</span><span class="mf">0.0</span>
+    <span class="p">)</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_link</span><span class="p">(</span><span class="n">links</span><span class="p">[</span><span class="s2">&quot;caster_5&quot;</span><span class="p">])</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">place_relative_to</span><span class="p">(</span>
+        <span class="s2">&quot;caster_5&quot;</span><span class="p">,</span> <span class="s2">&quot;chair_leg&quot;</span><span class="p">,</span> <span class="n">placement</span><span class="o">=</span><span class="s2">&quot;below&quot;</span><span class="p">,</span> <span class="n">clearance</span><span class="o">=</span><span class="mf">0.0</span>
+    <span class="p">)</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_link</span><span class="p">(</span><span class="n">links</span><span class="p">[</span><span class="s2">&quot;wheel_9&quot;</span><span class="p">])</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">place_relative_to</span><span class="p">(</span>
+        <span class="s2">&quot;wheel_9&quot;</span><span class="p">,</span> <span class="s2">&quot;caster_5&quot;</span><span class="p">,</span> <span class="n">placement</span><span class="o">=</span><span class="s2">&quot;below&quot;</span><span class="p">,</span> <span class="n">clearance</span><span class="o">=</span><span class="mf">0.0</span>
+    <span class="p">)</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_link</span><span class="p">(</span><span class="n">links</span><span class="p">[</span><span class="s2">&quot;wheel_10&quot;</span><span class="p">])</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">place_relative_to</span><span class="p">(</span>
+        <span class="s2">&quot;wheel_10&quot;</span><span class="p">,</span> <span class="s2">&quot;caster_5&quot;</span><span class="p">,</span> <span class="n">placement</span><span class="o">=</span><span class="s2">&quot;below&quot;</span><span class="p">,</span> <span class="n">clearance</span><span class="o">=</span><span class="mf">0.0</span>
+    <span class="p">)</span>
+    <span class="c1"># ====================JOINT PREDICTION====================</span>
+    <span class="c1"># The seat is moving down.</span>
+    <span class="c1"># The axis of motion is along the z-axis.</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">make_prismatic_joint</span><span class="p">(</span>
+        <span class="s2">&quot;seat&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;chair_leg&quot;</span><span class="p">,</span>
+        <span class="n">global_lower_point</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+        <span class="n">global_upper_point</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.10</span><span class="p">],</span>  <span class="c1"># chair leg moves downward as</span>
+        <span class="c1"># per groundtruth video</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">pred_robot</span>
+
+
+<span class="k">def</span> <span class="nf">partnet_36280</span><span class="p">(</span><span class="n">input_dir</span><span class="p">,</span> <span class="n">links</span><span class="p">,</span> <span class="n">joint_id</span><span class="o">=</span><span class="s2">&quot;joint_15&quot;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    No. masked_links: 18</span>
+<span class="sd">    Robot Link Summary:</span>
+<span class="sd">    - base</span>
+<span class="sd">    - caster</span>
+<span class="sd">    - wheel</span>
+<span class="sd">    - wheel_2</span>
+<span class="sd">    - caster_2</span>
+<span class="sd">    - wheel_3</span>
+<span class="sd">    - wheel_4</span>
+<span class="sd">    - caster_3</span>
+<span class="sd">    - wheel_5</span>
+<span class="sd">    - wheel_6</span>
+<span class="sd">    - caster_4</span>
+<span class="sd">    - wheel_7</span>
+<span class="sd">    - wheel_8</span>
+<span class="sd">    - caster_5</span>
+<span class="sd">    - wheel_9</span>
+<span class="sd">    - wheel_10</span>
+<span class="sd">    - seat</span>
+<span class="sd">    - chair_leg</span>
+
+
+<span class="sd">    Object: an office chair</span>
+<span class="sd">    Targetted affordance: &quot;seat&quot; can be rotated</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">pred_robot</span> <span class="o">=</span> <span class="n">Robot</span><span class="p">(</span><span class="n">input_dir</span><span class="o">=</span><span class="n">input_dir</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;office_chair&quot;</span><span class="p">)</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_link</span><span class="p">(</span><span class="n">links</span><span class="p">[</span><span class="s2">&quot;base&quot;</span><span class="p">])</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_link</span><span class="p">(</span><span class="n">links</span><span class="p">[</span><span class="s2">&quot;chair_leg&quot;</span><span class="p">])</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_joint</span><span class="p">(</span>
+        <span class="n">Joint</span><span class="p">(</span><span class="s2">&quot;base_to_chair_leg&quot;</span><span class="p">,</span> <span class="n">Parent</span><span class="p">(</span><span class="s2">&quot;base&quot;</span><span class="p">),</span>
+              <span class="n">Child</span><span class="p">(</span><span class="s2">&quot;chair_leg&quot;</span><span class="p">),</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;fixed&quot;</span><span class="p">),</span>
+    <span class="p">)</span>
+
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_link</span><span class="p">(</span><span class="n">links</span><span class="p">[</span><span class="s2">&quot;seat&quot;</span><span class="p">])</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">place_relative_to</span><span class="p">(</span>
+        <span class="s2">&quot;seat&quot;</span><span class="p">,</span> <span class="s2">&quot;chair_leg&quot;</span><span class="p">,</span> <span class="n">placement</span><span class="o">=</span><span class="s2">&quot;above&quot;</span><span class="p">,</span> <span class="n">clearance</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_link</span><span class="p">(</span><span class="n">links</span><span class="p">[</span><span class="s2">&quot;caster&quot;</span><span class="p">])</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">place_relative_to</span><span class="p">(</span>
+        <span class="s2">&quot;caster&quot;</span><span class="p">,</span> <span class="s2">&quot;chair_leg&quot;</span><span class="p">,</span> <span class="n">placement</span><span class="o">=</span><span class="s2">&quot;below&quot;</span><span class="p">,</span> <span class="n">clearance</span><span class="o">=</span><span class="mf">0.0</span>
+    <span class="p">)</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_link</span><span class="p">(</span><span class="n">links</span><span class="p">[</span><span class="s2">&quot;wheel&quot;</span><span class="p">])</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">place_relative_to</span><span class="p">(</span>
+        <span class="s2">&quot;wheel&quot;</span><span class="p">,</span> <span class="s2">&quot;caster&quot;</span><span class="p">,</span> <span class="n">placement</span><span class="o">=</span><span class="s2">&quot;below&quot;</span><span class="p">,</span> <span class="n">clearance</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_link</span><span class="p">(</span><span class="n">links</span><span class="p">[</span><span class="s2">&quot;wheel_2&quot;</span><span class="p">])</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">place_relative_to</span><span class="p">(</span>
+        <span class="s2">&quot;wheel_2&quot;</span><span class="p">,</span> <span class="s2">&quot;caster&quot;</span><span class="p">,</span> <span class="n">placement</span><span class="o">=</span><span class="s2">&quot;below&quot;</span><span class="p">,</span> <span class="n">clearance</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_link</span><span class="p">(</span><span class="n">links</span><span class="p">[</span><span class="s2">&quot;caster_2&quot;</span><span class="p">])</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">place_relative_to</span><span class="p">(</span>
+        <span class="s2">&quot;caster_2&quot;</span><span class="p">,</span> <span class="s2">&quot;chair_leg&quot;</span><span class="p">,</span> <span class="n">placement</span><span class="o">=</span><span class="s2">&quot;below&quot;</span><span class="p">,</span> <span class="n">clearance</span><span class="o">=</span><span class="mf">0.0</span>
+    <span class="p">)</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_link</span><span class="p">(</span><span class="n">links</span><span class="p">[</span><span class="s2">&quot;wheel_3&quot;</span><span class="p">])</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">place_relative_to</span><span class="p">(</span>
+        <span class="s2">&quot;wheel_3&quot;</span><span class="p">,</span> <span class="s2">&quot;caster_2&quot;</span><span class="p">,</span> <span class="n">placement</span><span class="o">=</span><span class="s2">&quot;below&quot;</span><span class="p">,</span> <span class="n">clearance</span><span class="o">=</span><span class="mf">0.0</span>
+    <span class="p">)</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_link</span><span class="p">(</span><span class="n">links</span><span class="p">[</span><span class="s2">&quot;wheel_4&quot;</span><span class="p">])</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">place_relative_to</span><span class="p">(</span>
+        <span class="s2">&quot;wheel_4&quot;</span><span class="p">,</span> <span class="s2">&quot;caster_2&quot;</span><span class="p">,</span> <span class="n">placement</span><span class="o">=</span><span class="s2">&quot;below&quot;</span><span class="p">,</span> <span class="n">clearance</span><span class="o">=</span><span class="mf">0.0</span>
+    <span class="p">)</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_link</span><span class="p">(</span><span class="n">links</span><span class="p">[</span><span class="s2">&quot;caster_3&quot;</span><span class="p">])</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">place_relative_to</span><span class="p">(</span>
+        <span class="s2">&quot;caster_3&quot;</span><span class="p">,</span> <span class="s2">&quot;chair_leg&quot;</span><span class="p">,</span> <span class="n">placement</span><span class="o">=</span><span class="s2">&quot;below&quot;</span><span class="p">,</span> <span class="n">clearance</span><span class="o">=</span><span class="mf">0.0</span>
+    <span class="p">)</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_link</span><span class="p">(</span><span class="n">links</span><span class="p">[</span><span class="s2">&quot;wheel_5&quot;</span><span class="p">])</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">place_relative_to</span><span class="p">(</span>
+        <span class="s2">&quot;wheel_5&quot;</span><span class="p">,</span> <span class="s2">&quot;caster_3&quot;</span><span class="p">,</span> <span class="n">placement</span><span class="o">=</span><span class="s2">&quot;below&quot;</span><span class="p">,</span> <span class="n">clearance</span><span class="o">=</span><span class="mf">0.0</span>
+    <span class="p">)</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_link</span><span class="p">(</span><span class="n">links</span><span class="p">[</span><span class="s2">&quot;wheel_6&quot;</span><span class="p">])</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">place_relative_to</span><span class="p">(</span>
+        <span class="s2">&quot;wheel_6&quot;</span><span class="p">,</span> <span class="s2">&quot;caster_3&quot;</span><span class="p">,</span> <span class="n">placement</span><span class="o">=</span><span class="s2">&quot;below&quot;</span><span class="p">,</span> <span class="n">clearance</span><span class="o">=</span><span class="mf">0.0</span>
+    <span class="p">)</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_link</span><span class="p">(</span><span class="n">links</span><span class="p">[</span><span class="s2">&quot;caster_4&quot;</span><span class="p">])</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">place_relative_to</span><span class="p">(</span>
+        <span class="s2">&quot;caster_4&quot;</span><span class="p">,</span> <span class="s2">&quot;chair_leg&quot;</span><span class="p">,</span> <span class="n">placement</span><span class="o">=</span><span class="s2">&quot;below&quot;</span><span class="p">,</span> <span class="n">clearance</span><span class="o">=</span><span class="mf">0.0</span>
+    <span class="p">)</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_link</span><span class="p">(</span><span class="n">links</span><span class="p">[</span><span class="s2">&quot;wheel_7&quot;</span><span class="p">])</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">place_relative_to</span><span class="p">(</span>
+        <span class="s2">&quot;wheel_7&quot;</span><span class="p">,</span> <span class="s2">&quot;caster_4&quot;</span><span class="p">,</span> <span class="n">placement</span><span class="o">=</span><span class="s2">&quot;below&quot;</span><span class="p">,</span> <span class="n">clearance</span><span class="o">=</span><span class="mf">0.0</span>
+    <span class="p">)</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_link</span><span class="p">(</span><span class="n">links</span><span class="p">[</span><span class="s2">&quot;wheel_8&quot;</span><span class="p">])</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">place_relative_to</span><span class="p">(</span>
+        <span class="s2">&quot;wheel_8&quot;</span><span class="p">,</span> <span class="s2">&quot;caster_4&quot;</span><span class="p">,</span> <span class="n">placement</span><span class="o">=</span><span class="s2">&quot;below&quot;</span><span class="p">,</span> <span class="n">clearance</span><span class="o">=</span><span class="mf">0.0</span>
+    <span class="p">)</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_link</span><span class="p">(</span><span class="n">links</span><span class="p">[</span><span class="s2">&quot;caster_5&quot;</span><span class="p">])</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">place_relative_to</span><span class="p">(</span>
+        <span class="s2">&quot;caster_5&quot;</span><span class="p">,</span> <span class="s2">&quot;chair_leg&quot;</span><span class="p">,</span> <span class="n">placement</span><span class="o">=</span><span class="s2">&quot;below&quot;</span><span class="p">,</span> <span class="n">clearance</span><span class="o">=</span><span class="mf">0.0</span>
+    <span class="p">)</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_link</span><span class="p">(</span><span class="n">links</span><span class="p">[</span><span class="s2">&quot;wheel_9&quot;</span><span class="p">])</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">place_relative_to</span><span class="p">(</span>
+        <span class="s2">&quot;wheel_9&quot;</span><span class="p">,</span> <span class="s2">&quot;caster_5&quot;</span><span class="p">,</span> <span class="n">placement</span><span class="o">=</span><span class="s2">&quot;below&quot;</span><span class="p">,</span> <span class="n">clearance</span><span class="o">=</span><span class="mf">0.0</span>
+    <span class="p">)</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_link</span><span class="p">(</span><span class="n">links</span><span class="p">[</span><span class="s2">&quot;wheel_10&quot;</span><span class="p">])</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">place_relative_to</span><span class="p">(</span>
+        <span class="s2">&quot;wheel_10&quot;</span><span class="p">,</span> <span class="s2">&quot;caster_5&quot;</span><span class="p">,</span> <span class="n">placement</span><span class="o">=</span><span class="s2">&quot;below&quot;</span><span class="p">,</span> <span class="n">clearance</span><span class="o">=</span><span class="mf">0.0</span>
+    <span class="p">)</span>
+    <span class="c1"># ====================JOINT PREDICTION====================</span>
+    <span class="c1"># the seat can rotate along its our center of mass (no pivot point)</span>
+    <span class="c1"># along the z-axis (vertical axis)</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">make_revolute_joint</span><span class="p">(</span>
+
+        <span class="s2">&quot;seat&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;chair_leg&quot;</span><span class="p">,</span>
+        <span class="n">global_axis</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+        <span class="n">lower_angle_deg</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">upper_angle_deg</span><span class="o">=</span><span class="mi">360</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">pred_robot</span>
+
+
+<span class="k">def</span> <span class="nf">partnet_3615</span><span class="p">(</span><span class="n">input_dir</span><span class="p">,</span> <span class="n">links</span><span class="p">,</span> <span class="n">joint_id</span><span class="o">=</span><span class="s2">&quot;joint_2&quot;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    No. masked_links: 3</span>
+<span class="sd">    Robot Link Summary:</span>
+<span class="sd">    - base</span>
+<span class="sd">    - lid</span>
+<span class="sd">    - bottle_body</span>
+
+<span class="sd">    Object: a bottle of liquid</span>
+<span class="sd">    Targetted affordance: &quot;lid&quot; can be pushed down</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">pred_robot</span> <span class="o">=</span> <span class="n">Robot</span><span class="p">(</span><span class="n">input_dir</span><span class="o">=</span><span class="n">input_dir</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;bottle&quot;</span><span class="p">)</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_link</span><span class="p">(</span><span class="n">links</span><span class="p">[</span><span class="s2">&quot;base&quot;</span><span class="p">])</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_link</span><span class="p">(</span><span class="n">links</span><span class="p">[</span><span class="s2">&quot;bottle_body&quot;</span><span class="p">])</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_joint</span><span class="p">(</span>
+        <span class="n">Joint</span><span class="p">(</span>
+            <span class="s2">&quot;base_to_bottle_body&quot;</span><span class="p">,</span> <span class="n">Parent</span><span class="p">(</span><span class="s2">&quot;base&quot;</span><span class="p">),</span> <span class="n">Child</span><span class="p">(</span><span class="s2">&quot;bottle_body&quot;</span><span class="p">),</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;fixed&quot;</span>
+        <span class="p">),</span>
+    <span class="p">)</span>
+
+    <span class="c1"># lid goes on top of the bottle. No clearance or further adjustment needed</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_link</span><span class="p">(</span><span class="n">links</span><span class="p">[</span><span class="s2">&quot;lid&quot;</span><span class="p">])</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">place_relative_to</span><span class="p">(</span>
+        <span class="s2">&quot;lid&quot;</span><span class="p">,</span> <span class="s2">&quot;bottle_body&quot;</span><span class="p">,</span> <span class="n">placement</span><span class="o">=</span><span class="s2">&quot;above&quot;</span><span class="p">,</span> <span class="n">clearance</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
+    <span class="c1"># ====================JOINT PREDICTION====================</span>
+    <span class="c1"># the lid moves along z-axis (vertical)</span>
+    <span class="n">lower_point</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="n">upper_point</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.1</span><span class="p">]</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">make_prismatic_joint</span><span class="p">(</span>
+        <span class="s2">&quot;lid&quot;</span><span class="p">,</span> <span class="s2">&quot;bottle_body&quot;</span><span class="p">,</span> <span class="n">lower_point</span><span class="p">,</span> <span class="n">upper_point</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">pred_robot</span>
+
+
+<span class="k">def</span> <span class="nf">partnet_12565</span><span class="p">(</span><span class="n">input_dir</span><span class="p">,</span> <span class="n">links</span><span class="p">,</span> <span class="n">joint_id</span><span class="o">=</span><span class="s2">&quot;joint_1&quot;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    No. masked_links: 3</span>
+<span class="sd">    Robot Link Summary:</span>
+<span class="sd">    - base</span>
+<span class="sd">    - dishwasher_body</span>
+<span class="sd">    - door</span>
+
+
+<span class="sd">    Object: a dishwasher</span>
+<span class="sd">    Targetted affordance: &quot;door&quot;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">pred_robot</span> <span class="o">=</span> <span class="n">Robot</span><span class="p">(</span><span class="n">input_dir</span><span class="o">=</span><span class="n">input_dir</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;dishwasher&quot;</span><span class="p">)</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_link</span><span class="p">(</span><span class="n">links</span><span class="p">[</span><span class="s2">&quot;base&quot;</span><span class="p">])</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_link</span><span class="p">(</span><span class="n">links</span><span class="p">[</span><span class="s2">&quot;dishwasher_body&quot;</span><span class="p">])</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_joint</span><span class="p">(</span>
+        <span class="n">Joint</span><span class="p">(</span>
+            <span class="s2">&quot;base_to_dishwasher_body&quot;</span><span class="p">,</span>
+            <span class="n">Parent</span><span class="p">(</span><span class="s2">&quot;base&quot;</span><span class="p">),</span>
+            <span class="n">Child</span><span class="p">(</span><span class="s2">&quot;dishwasher_body&quot;</span><span class="p">),</span>
+            <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;fixed&quot;</span><span class="p">,</span>
+        <span class="p">),</span>
+    <span class="p">)</span>
+
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_link</span><span class="p">(</span><span class="n">links</span><span class="p">[</span><span class="s2">&quot;door&quot;</span><span class="p">])</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">place_relative_to</span><span class="p">(</span>
+        <span class="s2">&quot;door&quot;</span><span class="p">,</span> <span class="s2">&quot;dishwasher_body&quot;</span><span class="p">,</span> <span class="n">placement</span><span class="o">=</span><span class="s2">&quot;front&quot;</span><span class="p">,</span> <span class="n">clearance</span><span class="o">=</span><span class="mf">0.0</span>
+    <span class="p">)</span>
+    <span class="c1"># ====================JOINT PREDICTION====================</span>
+    <span class="c1"># -- Groundtruth video analysis --</span>
+    <span class="c1"># in the groundtruth video, the door opens up while its BOTTOM part still</span>
+    <span class="c1"># attached to the body so the pivot point needs to be Back-Left-Bottom (BLB)</span>
+    <span class="c1"># or Back-Right-Bottom (BRB)</span>
+    <span class="n">door_bb</span> <span class="o">=</span> <span class="n">pred_robot</span><span class="o">.</span><span class="n">get_bounding_boxes</span><span class="p">(</span>
+        <span class="p">[</span><span class="s2">&quot;door&quot;</span><span class="p">],</span> <span class="n">include_dim</span><span class="o">=</span><span class="kc">False</span><span class="p">)[</span><span class="s2">&quot;door&quot;</span><span class="p">]</span>
+    <span class="n">door_vertices</span> <span class="o">=</span> <span class="n">compute_aabb_vertices</span><span class="p">(</span><span class="o">*</span><span class="n">door_bb</span><span class="p">)</span>
+    <span class="n">pivot_point</span> <span class="o">=</span> <span class="n">door_vertices</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># Back-Left-Bottom (BLB)</span>
+
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">make_revolute_joint</span><span class="p">(</span>
+        <span class="s2">&quot;door&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;dishwasher_body&quot;</span><span class="p">,</span>
+        <span class="n">global_axis</span><span class="o">=</span><span class="p">[</span>
+            <span class="mi">0</span><span class="p">,</span>
+            <span class="c1"># pivot-axis relationship:</span>
+            <span class="c1"># since the pivot is at the bottom and we want to open outward, set</span>
+            <span class="c1"># axis to positive</span>
+            <span class="mi">1</span><span class="p">,</span>
+            <span class="mi">0</span><span class="p">,</span>
+        <span class="p">],</span>  <span class="c1"># The door opens by opening up down: i.e., rotating along the left-right axis, which is y-axis</span>
+        <span class="n">lower_angle_deg</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">upper_angle_deg</span><span class="o">=</span><span class="mi">90</span><span class="p">,</span>  <span class="c1"># open outward</span>
+        <span class="n">pivot_point</span><span class="o">=</span><span class="n">pivot_point</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">pred_robot</span>
+
+
+<span class="k">def</span> <span class="nf">partnet_10900</span><span class="p">(</span><span class="n">input_dir</span><span class="p">,</span> <span class="n">links</span><span class="p">,</span> <span class="n">joint_id</span><span class="o">=</span><span class="s2">&quot;joint_0&quot;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    No. masked_links: 4</span>
+<span class="sd">    Robot Link Summary:</span>
+<span class="sd">    - base</span>
+<span class="sd">    - door</span>
+<span class="sd">    - door_2</span>
+<span class="sd">    - refrigerator_body</span>
+
+<span class="sd">    Object: a refrigerator with two doors</span>
+<span class="sd">    Targetted affordance: &quot;door&quot;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">pred_robot</span> <span class="o">=</span> <span class="n">Robot</span><span class="p">(</span><span class="n">input_dir</span><span class="o">=</span><span class="n">input_dir</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;refrigerator&quot;</span><span class="p">)</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_link</span><span class="p">(</span><span class="n">links</span><span class="p">[</span><span class="s2">&quot;base&quot;</span><span class="p">])</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_link</span><span class="p">(</span><span class="n">links</span><span class="p">[</span><span class="s2">&quot;refrigerator_body&quot;</span><span class="p">])</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_joint</span><span class="p">(</span>
+        <span class="n">Joint</span><span class="p">(</span>
+            <span class="s2">&quot;base_to_refrigerator_body&quot;</span><span class="p">,</span>
+            <span class="n">Parent</span><span class="p">(</span><span class="s2">&quot;base&quot;</span><span class="p">),</span>
+            <span class="n">Child</span><span class="p">(</span><span class="s2">&quot;refrigerator_body&quot;</span><span class="p">),</span>
+            <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;fixed&quot;</span><span class="p">,</span>
+        <span class="p">),</span>
+    <span class="p">)</span>
+
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_link</span><span class="p">(</span><span class="n">links</span><span class="p">[</span><span class="s2">&quot;door&quot;</span><span class="p">])</span>
+    <span class="c1"># refrigerator doors go in front of the refrigerator body.</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">place_relative_to</span><span class="p">(</span>
+        <span class="s2">&quot;door&quot;</span><span class="p">,</span> <span class="s2">&quot;refrigerator_body&quot;</span><span class="p">,</span> <span class="n">placement</span><span class="o">=</span><span class="s2">&quot;front&quot;</span><span class="p">,</span> <span class="n">clearance</span><span class="o">=</span><span class="mf">0.0</span>
+    <span class="p">)</span>
+
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_link</span><span class="p">(</span><span class="n">links</span><span class="p">[</span><span class="s2">&quot;door_2&quot;</span><span class="p">])</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">place_relative_to</span><span class="p">(</span>
+        <span class="s2">&quot;door_2&quot;</span><span class="p">,</span> <span class="s2">&quot;refrigerator_body&quot;</span><span class="p">,</span> <span class="n">placement</span><span class="o">=</span><span class="s2">&quot;front&quot;</span><span class="p">,</span> <span class="n">clearance</span><span class="o">=</span><span class="mf">0.0</span>
+    <span class="p">)</span>
+    <span class="c1"># ====================JOINT PREDICTION====================</span>
+    <span class="c1"># -- Groundtruth video analysis --</span>
+    <span class="c1"># in the groundtruth video, the left door opens up while its right part still</span>
+    <span class="c1"># attached to the body so the pivot point needs to be Back-Right-Bottom (BRB)</span>
+    <span class="c1"># or Back-Right-Top (BRT)</span>
+    <span class="n">target_door_link</span> <span class="o">=</span> <span class="s2">&quot;door&quot;</span>
+    <span class="n">door_bb</span> <span class="o">=</span> <span class="n">pred_robot</span><span class="o">.</span><span class="n">get_bounding_boxes</span><span class="p">([</span><span class="n">target_door_link</span><span class="p">],</span> <span class="n">include_dim</span><span class="o">=</span><span class="kc">False</span><span class="p">)[</span>
+        <span class="n">target_door_link</span>
+    <span class="p">]</span>
+    <span class="n">door_vertices</span> <span class="o">=</span> <span class="n">compute_aabb_vertices</span><span class="p">(</span><span class="o">*</span><span class="n">door_bb</span><span class="p">)</span>
+    <span class="n">pivot_point</span> <span class="o">=</span> <span class="n">door_vertices</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>  <span class="c1"># Back-Right-Bottom (BRB)</span>
+
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">make_revolute_joint</span><span class="p">(</span>
+        <span class="n">target_door_link</span><span class="p">,</span>
+        <span class="s2">&quot;refrigerator_body&quot;</span><span class="p">,</span>
+        <span class="n">global_axis</span><span class="o">=</span><span class="p">[</span>
+            <span class="mi">0</span><span class="p">,</span>
+            <span class="mi">0</span><span class="p">,</span>
+            <span class="c1"># pivot-axis relationship:</span>
+            <span class="c1"># since the pivot is on the right and we want to open outward, set</span>
+            <span class="c1"># axis to positive</span>
+            <span class="mi">1</span><span class="p">,</span>  <span class="c1"># opening up</span>
+        <span class="p">],</span>  <span class="c1"># The refrigerator door swings open and closed around the vertical axis,</span>
+        <span class="c1"># which is the z-axis.</span>
+        <span class="n">lower_angle_deg</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">upper_angle_deg</span><span class="o">=</span><span class="mi">90</span><span class="p">,</span>  <span class="c1"># open outward</span>
+        <span class="n">pivot_point</span><span class="o">=</span><span class="n">pivot_point</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">pred_robot</span>
+
+
+<span class="k">def</span> <span class="nf">partnet_7366</span><span class="p">(</span><span class="n">input_dir</span><span class="p">,</span> <span class="n">links</span><span class="p">,</span> <span class="n">joint_id</span><span class="o">=</span><span class="s2">&quot;joint_1&quot;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    No. masked_links: 5</span>
+<span class="sd">    Robot Link Summary:</span>
+<span class="sd">    - base</span>
+<span class="sd">    - tray</span>
+<span class="sd">    - door</span>
+<span class="sd">    - button</span>
+<span class="sd">    - microwave_body</span>
+
+<span class="sd">    Object: a microwave</span>
+<span class="sd">    Targetted affordance: &quot;door&quot;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">pred_robot</span> <span class="o">=</span> <span class="n">Robot</span><span class="p">(</span><span class="n">input_dir</span><span class="o">=</span><span class="n">input_dir</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;microwave&quot;</span><span class="p">)</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_link</span><span class="p">(</span><span class="n">links</span><span class="p">[</span><span class="s1">&#39;base&#39;</span><span class="p">])</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_link</span><span class="p">(</span><span class="n">links</span><span class="p">[</span><span class="s1">&#39;microwave_body&#39;</span><span class="p">])</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_joint</span><span class="p">(</span><span class="n">Joint</span><span class="p">(</span><span class="s2">&quot;base_to_microwave_body&quot;</span><span class="p">,</span>
+                         <span class="n">Parent</span><span class="p">(</span><span class="s2">&quot;base&quot;</span><span class="p">),</span>
+                         <span class="n">Child</span><span class="p">(</span><span class="s2">&quot;microwave_body&quot;</span><span class="p">),</span>
+                         <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;fixed&quot;</span><span class="p">),</span>
+                         <span class="p">)</span>
+
+    <span class="c1"># =============================================</span>
+    <span class="c1"># partnet mobility peculiarity: need to always call this function</span>
+    <span class="c1"># after the first joint to orientate the robot correctly</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">align_robot_orientation</span><span class="p">()</span>
+    <span class="c1"># =============================================</span>
+
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_link</span><span class="p">(</span><span class="n">links</span><span class="p">[</span><span class="s1">&#39;tray&#39;</span><span class="p">])</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">place_relative_to</span><span class="p">(</span><span class="s1">&#39;tray&#39;</span><span class="p">,</span> <span class="s1">&#39;microwave_body&#39;</span><span class="p">,</span>
+                                 <span class="n">placement</span><span class="o">=</span><span class="s2">&quot;inside&quot;</span><span class="p">,</span>
+                                 <span class="n">clearance</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
+
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_link</span><span class="p">(</span><span class="n">links</span><span class="p">[</span><span class="s1">&#39;door&#39;</span><span class="p">])</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">place_relative_to</span><span class="p">(</span><span class="s1">&#39;door&#39;</span><span class="p">,</span> <span class="s1">&#39;microwave_body&#39;</span><span class="p">,</span>
+                                 <span class="n">placement</span><span class="o">=</span><span class="s2">&quot;front&quot;</span><span class="p">,</span>
+                                 <span class="n">clearance</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
+
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_link</span><span class="p">(</span><span class="n">links</span><span class="p">[</span><span class="s1">&#39;button&#39;</span><span class="p">])</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">place_relative_to</span><span class="p">(</span><span class="s1">&#39;button&#39;</span><span class="p">,</span> <span class="s1">&#39;microwave_body&#39;</span><span class="p">,</span>
+                                 <span class="n">placement</span><span class="o">=</span><span class="s2">&quot;front&quot;</span><span class="p">,</span>
+                                 <span class="n">clearance</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
+    <span class="c1"># ====================JOINT PREDICTION====================</span>
+    <span class="c1"># -- Groundtruth video analysis --</span>
+    <span class="c1"># in the groundtruth video, the door opens up while its left part still</span>
+    <span class="c1"># attached to the body so the pivot point needs to be Back-Left-Bottom (BLB)</span>
+    <span class="c1"># or Back-Left-Top (BLT)</span>
+    <span class="n">door_bb</span> <span class="o">=</span> <span class="n">pred_robot</span><span class="o">.</span><span class="n">get_bounding_boxes</span><span class="p">(</span>
+        <span class="p">[</span><span class="s1">&#39;door&#39;</span><span class="p">],</span> <span class="n">include_dim</span><span class="o">=</span><span class="kc">False</span><span class="p">)[</span><span class="s1">&#39;door&#39;</span><span class="p">]</span>
+    <span class="n">door_vertices</span> <span class="o">=</span> <span class="n">compute_aabb_vertices</span><span class="p">(</span><span class="o">*</span><span class="n">door_bb</span><span class="p">)</span>
+    <span class="n">pivot_point</span> <span class="o">=</span> <span class="n">door_vertices</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># Back-Left-Bottom (BLB)</span>
+
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">make_revolute_joint</span><span class="p">(</span>
+        <span class="s2">&quot;door&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;microwave_body&quot;</span><span class="p">,</span>
+        <span class="n">global_axis</span><span class="o">=</span><span class="p">[</span>
+            <span class="mi">0</span><span class="p">,</span>
+            <span class="mi">0</span><span class="p">,</span>
+            <span class="c1"># pivot-axis relationship:</span>
+            <span class="c1"># since the pivot is on the left and we want to open outward, set</span>
+            <span class="c1"># axis to negative</span>
+            <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+        <span class="p">],</span>  <span class="c1"># The microwave door swings open and closed around the vertical axis,</span>
+        <span class="c1"># which is the z-axis. Negative z-axis because the pivot point is on the left</span>
+        <span class="n">lower_angle_deg</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">upper_angle_deg</span><span class="o">=</span><span class="mi">90</span><span class="p">,</span>  <span class="c1"># open outward</span>
+        <span class="n">pivot_point</span><span class="o">=</span><span class="n">pivot_point</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">pred_robot</span>
+
+
+<span class="k">def</span> <span class="nf">partnet_10383</span><span class="p">(</span><span class="n">input_dir</span><span class="p">,</span> <span class="n">links</span><span class="p">,</span> <span class="n">joint_id</span><span class="o">=</span><span class="s2">&quot;joint_1&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Robot</span><span class="p">:</span>
+    <span class="n">pred_robot</span> <span class="o">=</span> <span class="n">Robot</span><span class="p">(</span><span class="n">input_dir</span><span class="o">=</span><span class="n">input_dir</span><span class="p">)</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_link</span><span class="p">(</span><span class="n">links</span><span class="p">[</span><span class="s2">&quot;base&quot;</span><span class="p">])</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_link</span><span class="p">(</span><span class="n">links</span><span class="p">[</span><span class="s2">&quot;laptop_base&quot;</span><span class="p">])</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_joint</span><span class="p">(</span>
+        <span class="n">Joint</span><span class="p">(</span>
+            <span class="s2">&quot;base_to_laptop_base&quot;</span><span class="p">,</span>
+            <span class="n">Parent</span><span class="p">(</span><span class="s2">&quot;base&quot;</span><span class="p">),</span>
+            <span class="n">Child</span><span class="p">(</span><span class="s2">&quot;laptop_base&quot;</span><span class="p">),</span>
+            <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;fixed&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">add_link</span><span class="p">(</span><span class="n">links</span><span class="p">[</span><span class="s2">&quot;screen&quot;</span><span class="p">])</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">place_relative_to</span><span class="p">(</span>
+        <span class="s2">&quot;screen&quot;</span><span class="p">,</span> <span class="s2">&quot;laptop_base&quot;</span><span class="p">,</span> <span class="n">placement</span><span class="o">=</span><span class="s2">&quot;above&quot;</span><span class="p">,</span> <span class="n">clearance</span><span class="o">=</span><span class="mf">0.0</span>
+    <span class="p">)</span>
+    <span class="c1"># ====================JOINT PREDICTION====================</span>
+    <span class="c1"># The screen is hinged at the bottom and opens up and down.</span>
+    <span class="c1"># The axis of motion is along the y-axis.</span>
+    <span class="n">screen_bb</span> <span class="o">=</span> <span class="n">pred_robot</span><span class="o">.</span><span class="n">get_bounding_boxes</span><span class="p">(</span>
+        <span class="p">[</span><span class="s2">&quot;screen&quot;</span><span class="p">],</span> <span class="n">include_dim</span><span class="o">=</span><span class="kc">False</span><span class="p">)[</span><span class="s2">&quot;screen&quot;</span><span class="p">]</span>
+    <span class="n">screen_vertices</span> <span class="o">=</span> <span class="n">compute_aabb_vertices</span><span class="p">(</span><span class="o">*</span><span class="n">screen_bb</span><span class="p">)</span>
+    <span class="n">pivot_point</span> <span class="o">=</span> <span class="n">screen_vertices</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>  <span class="c1"># Front-Left-Bottom (FLB)</span>
+    <span class="c1"># laptop is special case where we attach the screen at Front instead of Back</span>
+    <span class="c1"># This is because the default mesh of the laptop is standing up slightly tilted backward</span>
+    <span class="c1"># so the front part is attached to the base</span>
+    <span class="n">pred_robot</span><span class="o">.</span><span class="n">make_revolute_joint</span><span class="p">(</span>
+        <span class="s2">&quot;screen&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;laptop_base&quot;</span><span class="p">,</span>
+        <span class="c1"># the laptop screen rotate along y-axis (left-right axis)</span>
+        <span class="n">global_axis</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+        <span class="n">lower_angle_deg</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">upper_angle_deg</span><span class="o">=</span><span class="mi">135</span><span class="p">,</span>  <span class="c1"># open up</span>
+        <span class="n">pivot_point</span><span class="o">=</span><span class="n">pivot_point</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">pred_robot</span>
+</code></pre>
+  </div>
+  
+  <h2>Video Input</h2>
+  
+  <p>We will also give you a Video of the object joint in action. Please study the image carefully to understand the correct behavior of the object joint.</p>
+  
+  <h2>CoTracker Motion Tracing</h2>
+  
+  <p>We also use a motion tracker algorithm (CoTracker) to highlight the moving part in the videos. Pay close attention to the motion traces annotated in the videos to gain
+  information about the joint type, axis, origin, and limit.</p>
+  
+  <p>Important points:</p>
+  
+  <ul>
+  <li>Ignore traces in the background.</li>
+  <li>Sometimes, cotracker might fail to capture traces of moving parts especially when the parts is moving forward and backward. Do your best to detect motion on your own.</li>
+  <li>Traces moving in an arc indicates a revolute joint while linear traces indicate a prismatic joint.</li>
+  </ul>
+  
+  <h2>Targetted Affordance</h2>
+  
+  <ul>
+  <li>You must only make the kinematic joints targetted in the groundtruth input. We will provide you the targetted affordance. You must then include the comment
+<pre><code>Object: {description}
+Targetted affordance: {description}
+</code></pre>
+  to the code after the link summary as seen in our provided example codes.</li>
+  </ul>
+  
+  <h2>Ending Instructions</h2>
+  
+  <p><strong>Retry instruction</strong>: We might also provide you some feedback on your previously generated output.
+  In that case, you <strong>must</strong> take the feedback into account when rewriting the previous function.</p>
+  
+  <p>Important points:</p>
+  
+  <ul>
+  <li>Make sure that for revolute joint, lower_angle_deg &lt; upper_angle_deg.</li>
+  <li>If you're given a video or image of the groundtruth object joint, make sure to study the provided input carefully to understand the correct behavior of the object joint.</li>
+  <li>Do not make joints whose direct parent is <code>base</code>. For example, <code>make_revolute_joint("link1", "base",...)</code> is not a good practice. Instead,
+  consider making joints between two non-base links. </li>
+  <li>Joint axis order is [x, y, z]:
+  <ul>
+  <li>x : forward -- positive x, backward -- negative x</li>
+  <li>y: right -- positive y, left -- negative y</li>
+  <li>z: up -- positive z, down -- negative z</li>
+  </ul></li>
+  <li>When applicable, pay close attention to the relationship between pivot points and joint axis as demonstrated in the provided examples.</li>
+  <li>When feedback is provided, pay close attention to <code>improvement_suggestion</code> and modify the code accordingly.</li>
+  <li>Only include this import statement <code>from articulate_anything.api.odio_urdf import *</code>. Remove any other import statements.</li>
+  <li>Your return format is
+  <div class="codehilite">
+<pre><span></span><code>{Describe what is going on in the input image/video if provided}
+</code></pre>
+  </div></li>
+  </ul>
+  
+  <div class="codehilite">
+<pre><span></span><code><span class="p">{</span><span class="n">your</span> <span class="n">code</span> <span class="n">here</span><span class="p">}</span>
+</code></pre>
+  </div>
+</blockquote>
+</p>
+    </body>
+    </html>
+    

@@ -1,0 +1,17 @@
+object_id: 39392
+Robot Link Summary:
+ - base
+ - lever
+ - knob
+ - wheel
+ - wheel_2
+ - wheel_3
+ - wheel_4
+ - wheel_5
+ - seat
+ - caster
+ - caster_2
+ - caster_3
+ - caster_4
+ - caster_5
+ - chair_leg

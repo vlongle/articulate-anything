@@ -1,0 +1,3 @@
+mode: image # {text, image}
+link_summary_path: null # do NOT set this value
+new_box_layout: null # do NOT set this value

@@ -1,0 +1,2 @@
+video_encoding_strategy: individual # (individual, concatenate)
+num_frames: 5

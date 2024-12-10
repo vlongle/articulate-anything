@@ -1,0 +1,38 @@
+prompt: "chair"
+additional_prompt: null
+modality: "text"
+out_dir: "results"
+dataset_dir: "datasets/partnet-mobility-v0/dataset"
+api_key: null
+parallel: 1
+max_load_per_gpu: 10
+obj_ids: null
+gpu_id: 0
+cam_view: frontview
+model_name: gemini-1.5-flash-latest
+link_placement_path: null
+gen_config:
+  overwrite: false # whether to overwrite the VLM output
+render_part_views: false
+
+actor_critic:
+  actor_only: false
+  start_seed: 0
+  num_seeds: 1
+  start_iter: 0
+  max_iter: 1
+  conservative: true
+  cutoff: 5
+
+defaults:
+  - video_encoding: default
+  - category_selector: default
+  - obj_selector: default
+  - simulator: default
+  - link_actor: default
+  - link_critic: default
+  - partnet_mesh_retrieval: default
+  - cotracker: default
+  - in_context: default
+  - joint_actor: default
+  - joint_critic: default
