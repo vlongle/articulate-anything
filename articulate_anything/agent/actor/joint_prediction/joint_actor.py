@@ -44,7 +44,7 @@ You're only responsible for creating the joint for the object. Particularly, we 
 
 Note that your `partnet_{object_id}` function must begin with the code that we provide you for the object placement. Then you must include this comment
 "# ====================JOINT PREDICTION====================" before you start writing the code for the joint prediction. Please ensure that the code
-runs without any errors. DO NOT MODIFY the link placement code. Make sure to use the same link names as provided in the link placement code.
+runs without any errors. DO NOT MODIFY the link placement code. Make sure to use the same link names as provided in the link placement code. Make sure to include the import statement `from articulate_anything.api.odio_urdf import *`.
 
 We have some helper functions that might be useful for you.
 ```python

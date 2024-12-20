@@ -5,13 +5,49 @@
 
 <div align="center">
 
-# Articulate Anything
+# Articulate Anything: Automatic Modeling of Articulated Objects via a Vision-Language Foundation Model
+
 
 [![Python Version](https://img.shields.io/badge/Python-3.9-blue.svg)](https://github.com/vlongle/articulate-anything)
-[![Framework](https://img.shields.io/badge/Framework-PyTorch-red.svg)](https://pytorch.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![arXiv](https://img.shields.io/badge/arXiv-2401.XXXXX-b31b1b.svg)](https://arxiv.org/abs/2410.13882)
 [![Dataset](https://img.shields.io/badge/🤗_Dataset-Hugging_Face-orange.svg)](https://huggingface.co/datasets/vlongle/articulate-anything-dataset-preprocessed/tree/main)
+[![Twitter follow](https://img.shields.io/twitter/follow/LongLeRobot?style=social&label=follow)](https://twitter.com/LongLeRobot)
+
+
+ <div align="center" margin-bottom="6em">
+         <span class="author-block">
+                <a target="_blank" rel="noopener noreferrer" href="https://vlongle.github.io">Long Le</a>
+              </span>
+            <a target="_blank" rel="noopener noreferrer" href="https://www.jchunx.dev/">Jason Xie</a>,</span>
+              <span class="author-block">
+                <a target="_blank" rel="noopener noreferrer" href="https://willjhliang.github.io/">William
+                  Liang</a>,</span>
+              <span class="author-block">
+                <a target="_blank" rel="noopener noreferrer" href="https://johnny-wang16.github.io/">Hung-Ju
+                  Wang</a>,</span>
+              <span class="author-block">
+                <a target="_blank" rel="noopener noreferrer" href="https://yueyang1996.github.io/">Yue Yang</a>,
+              </span> <br>
+              <span class="author-block">
+                <a target="_blank" rel="noopener noreferrer" href="https://jasonma2016.github.io/">Jason Ma</a>,
+              </span>
+              <span class="author-block">
+                <a target="_blank" rel="noopener noreferrer" href="https://vedder.io/">Kyle Vedder</a>,
+              </span>
+              <span class="author-block">
+                <a target="_blank" rel="noopener noreferrer" href="https://arjun-krishna.github.io/">Arjun Krishna</a>,
+              </span>
+              <span class="author-block">
+                <a target="_blank" rel="noopener noreferrer" href="https://www.seas.upenn.edu/~dineshj/">Dinesh
+                  Jayaraman</a>,
+              </span>
+              <span class="author-block">
+                <a target="_blank" rel="noopener noreferrer" href="https://www.seas.upenn.edu/~eeaton/">Eric Eaton</a>
+              </span>
+   <br>
+   University of Pennsylvania
+</div>
 
 
 [[Project Website]](https://articulate-anything.github.io)
@@ -37,20 +73,6 @@ https://github.com/user-attachments/assets/3c23f423-3bdd-4843-a4e3-e1c7f26bfc42
 - <img src="assets/Figures/emojis/monkey_image.png" alt="Image Input" width="50" style="vertical-align: middle;"/> Articulate 3D objects from 🖼 images
 - <img src="assets/Figures/emojis/monkey_video.png" alt="Video Input" width="50" style="vertical-align: middle;"/> Articulate 3D objects from 🎥  videos
 
-
-
-> 🚀 **QUICK START**: Skip preprocessing by downloading our preprocessed PartNet-Mobility dataset:
-> 
-> 🤗 [Articulate-Anything Dataset on Hugging Face](https://huggingface.co/datasets/vlongle/articulate-anything-dataset-preprocessed/tree/main)
-
-To use an interactive demo, run
-```bash
-python gradio_app.py
-```
-**after** you have run the preprocessing steps as explained below in [Demo](#demo) section.
-
-![alt text](assets/Figures/gradio_app.png)
-
 We use [Hydra](https://hydra.cc/) for configuration management. You can easily customize the system by modifying the configuration files in `configs/` or overload parameters from the command line. We can automatically articulate a variety of input modalities from a single command
 
 ```bash
@@ -58,16 +80,16 @@ We use [Hydra](https://hydra.cc/) for configuration management. You can easily c
 ```
 Articulate-anything uses a **actor-critic** system, allowing for self-correction and self-improvement over iterations. 
 
-<!-- You can visualize the link prediction over time:
 
-![alt text](assets/Figures/code/link_viz.png)
+## 🚀 QUICK START
+1. Download preprocessed PartNet-Mobility dataset from 🤗 [Articulate-Anything Dataset on Hugging Face](https://huggingface.co/datasets/vlongle/articulate-anything-dataset-preprocessed/tree/main).
 
-or the joint prediction over time:
+2. To use an interactive demo, run
+   ```bash
+   python gradio_app.py
+   ```
 
-![alt text](assets/Figures/code/joint_viz.png)
 
-in only a few lines of codes. See [<img align="center" src="assets/Figures/jupyter-logo.svg" width="20"/> Open in Jupyter Notebook](examples/articulate_partnet.ipynb) for a more detailed guides.
- -->
 
 See below for more detailed guides.
 
@@ -85,6 +107,10 @@ See below for more detailed guides.
 - [Citation](#citation)
 
 ## Installation
+
+> [!NOTE]  
+> Skip the downloading raw dataset step if you have already downloaded our dataset from 🤗 [Articulate-Anything Dataset on Hugging Face](https://huggingface.co/datasets/vlongle/articulate-anything-dataset-preprocessed/tree/main).
+
 
 1. Clone the repository:
    ```bash
@@ -120,6 +146,11 @@ Our system supports Google Gemini, OpenAI GPT, and Anthropic Claude. You can set
 ## Usage
 
 We support reconstruction from in-the-wild text, images, or videos, or masked reconstruction from PartNet-Mobility dataset.
+
+> [!NOTE]  
+> Skip all the processing steps if you have downloaded our preprocessed dataset from 🤗 [Articulate-Anything Dataset on Hugging Face](https://huggingface.co/datasets/vlongle/articulate-anything-dataset-preprocessed/tree/main).
+
+
 
 <h3 id="demo">Demo</h3>
 
