@@ -11,6 +11,8 @@
 [![Framework](https://img.shields.io/badge/Framework-PyTorch-red.svg)](https://pytorch.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![arXiv](https://img.shields.io/badge/arXiv-2401.XXXXX-b31b1b.svg)](https://arxiv.org/abs/2410.13882)
+[![Dataset](https://img.shields.io/badge/🤗_Dataset-Hugging_Face-orange.svg)](https://huggingface.co/datasets/vlongle/articulate-anything-dataset-preprocessed/tree/main)
+
 
 [[Project Website]](https://articulate-anything.github.io)
 [[Paper]](https://arxiv.org/abs/2410.13882)
@@ -35,6 +37,11 @@ https://github.com/user-attachments/assets/3c23f423-3bdd-4843-a4e3-e1c7f26bfc42
 - <img src="assets/Figures/emojis/monkey_image.png" alt="Image Input" width="50" style="vertical-align: middle;"/> Articulate 3D objects from 🖼 images
 - <img src="assets/Figures/emojis/monkey_video.png" alt="Video Input" width="50" style="vertical-align: middle;"/> Articulate 3D objects from 🎥  videos
 
+
+
+> 🚀 **QUICK START**: Skip preprocessing by downloading our preprocessed PartNet-Mobility dataset:
+> 
+> 🤗 [Articulate-Anything Dataset on Hugging Face](https://huggingface.co/datasets/vlongle/articulate-anything-dataset-preprocessed/tree/main)
 
 To use an interactive demo, run
 ```bash

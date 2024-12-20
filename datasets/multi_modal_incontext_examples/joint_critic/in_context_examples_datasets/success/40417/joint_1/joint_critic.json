@@ -1,0 +1,8 @@
+{
+  "gt_description": "The motion trace shows the door opens by rotating forward along the vertical axis (z)",
+  "pred_description": "The motion trace shows the door opens by rotating forward along the vertical axis (z)",
+  "candidate_function_description": "The `candidate_function` has `make_revolute_joint` and axis is [0, 0, 1], which is vertical (z-axis) and correct. The pivot point is set to Front-left-bottom which is correct because the door is located in the `left` so this point would be attached to the body.",
+  "failure_reason": "success",
+  "improvement_suggestion": "None",
+  "realism_rating": 10
+}

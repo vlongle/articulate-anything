@@ -1,0 +1,9 @@
+{
+  "gt_description": "The motion trace shows the door opens by rotating along the left-right axis (y-axis). The arc moves from top to bottom",
+  "pred_description": "The motion trace shows the doors opens by rotating forward along the vertical axis (z).",
+  "candidate_function_description": "We have `make_revolute_joint` which is correct but the axis `[0, 0, 1]` is incorrect.",
+  "failure_reason": "joint_axis",
+  "improvement_suggestion": "Consider changing `joint_axis` to y-axis (i.e., `[0, 1, 0]`)",
+  "realism_rating": 1
+}
+

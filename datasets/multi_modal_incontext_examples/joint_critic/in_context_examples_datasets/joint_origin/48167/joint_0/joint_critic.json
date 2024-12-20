@@ -1,0 +1,8 @@
+{
+  "gt_description": "The motion trace shows the door opens by rotating forward along the left-right axis (y) while the **TOP** part fixed to the body.",
+  "pred_description": "The motion trace shows the door opens by rotating forward along the left-right axis (y) while the **BOTTOM** part fixed to the body",
+  "candidate_function_description": "The `candidate_function` has `make_revolute_joint` and axis is [0, 1, 0], which is left-right (y-axis) and correct. The pivot point is set to Front-Right-**Bottom**  which is incorrect. Note that in the groundtruth, the top part of the door is fixed to the body.",
+  "failure_reason": "joint_origin",
+  "improvement_suggestion": "Try changing the pivot to the top part of the door (e.g. Front-Right-**TOP**) to make the joint more like the groundtruth video.",
+  "realism_rating": 2
+}

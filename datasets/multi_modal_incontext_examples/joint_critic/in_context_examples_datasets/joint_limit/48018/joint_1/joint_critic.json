@@ -1,0 +1,8 @@
+{
+  "gt_description": "The motion trace shows the door opens by rotating outward along the vertical axis (z) while the left part fixed to the body",
+  "pred_description": "The motion trace shows the door opens by rotating **inward** along the vertical axis (z) while the left part fixed to the body. The prediction doesn't look similar to the groundtruth as the door appears to be moving inward into the body instead of outward.",
+  "candidate_function_description": "The `candidate_function` has `make_revolute_joint` and axis is [0, 0, 1], which is vertical (z-axis). The pivot point is set to Front-Left-Bottom which is correct, keeping the left part of the door fixed to the body. However, the door opens inward instead of outward so this is a joint limit issue.",
+  "failure_reason": "joint_limit",
+  "improvement_suggestion": "In our convention, left is negative so in order to open outward, the axis must be negative: i.e. [0, 0, -1]. The current axis is [0, 0, 1]. Try negating it",
+  "realism_rating": 3
+}

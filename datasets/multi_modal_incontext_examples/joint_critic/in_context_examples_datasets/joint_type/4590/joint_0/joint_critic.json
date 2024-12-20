@@ -1,0 +1,8 @@
+{
+    "gt_description": "The gt video shows the monitor slides up in a linear motion (for adjusting the monitor's height)",
+    "pred_description": "The pred video shows the monitor rotates.",
+    "candidate_function_description": "The `candidate_function` has `make_revolute_joint`, which is incorrect.",
+    "failure_reason": "joint_type",
+    "improvement_suggestion": "Consider changing the joint type to prismatic to allow sliding motion",
+    "realism_rating": 0
+}
