@@ -91,7 +91,9 @@ Articulate-anything uses a **actor-critic** system, allowing for self-correction
 
 
 
-https://github.com/user-attachments/assets/9e9bb15f-766d-4f6e-8fa1-e26cfb025fb2
+
+https://github.com/user-attachments/assets/3b8edddd-3c26-4691-a9b6-8bfc6c8f4a8d
+
 
 
 
