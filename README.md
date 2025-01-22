@@ -6,6 +6,7 @@
 <div align="center">
 
 # Articulate Anything: Automatic Modeling of Articulated Objects via a Vision-Language Foundation Model
+# ICLR 2025
 
 
 [![Python Version](https://img.shields.io/badge/Python-3.9-blue.svg)](https://github.com/vlongle/articulate-anything)
