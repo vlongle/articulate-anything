@@ -182,7 +182,7 @@ We support reconstruction from in-the-wild text, images, or videos, or masked re
    or run
 
    ```bash
-     python articulate.py modality=partnet prompt=35059 out_dir=results additional_prompt=joint_0
+     python articulate.py modality=partnet prompt=45384 out_dir=results additional_prompt=joint_0
    ```
 to run for `object_id`=149.
 

@@ -6,4 +6,4 @@ targetted_joint: null ## DO NOT SET THIS. THIS WILL BE SET BY THE SYSTEM
 targetted_semantic_joint: null ## DO NOT SET THIS. THIS WILL BE SET BY THE SYSTEM
 targetted_semantic_part: null ## DO NOT SET THIS. THIS WILL BE SET BY THE SYSTEM
 link_placement_path: null ## DO NOT SET THIS. THIS WILL BE SET BY THE SYSTEM
-examples_dir: null ## for `incontext` prompting only
+examples_dir: datasets/multi_modal_incontext_examples/joint_actor/in_context_actor_examples_datasets ## for `incontext` prompting only

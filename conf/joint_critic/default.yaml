@@ -1,4 +1,4 @@
 mode: video # (video)
 type: incontext # (basic, incontext)
 use_cotracker: true
-examples_dir: null ## for `incontext` prompting only
+examples_dir: datasets/multi_modal_incontext_examples/joint_critic/in_context_actor_examples_datasets ## for `incontext` prompting only
