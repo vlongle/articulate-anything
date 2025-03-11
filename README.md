@@ -197,7 +197,7 @@ Our precomputed CLIP embeddings is available from our repo in `partnet_mobility_
 
 1. Run the preprocessing with `render_aprt_views=true` to render part views for later part annotation.
 ```bash
-   python articulate_anything/preprocess/preprocess_partnet.py parallel={int} modality=text render_part_views=true
+   python articulate_anything/preprocess/preprocess_partnet.py parallel={int} modality=text render_part_views=true 
 ```
 2. Annotate mesh parts using VLM (skip if using our precomputed embeddings):
    ```bash
@@ -215,7 +215,7 @@ Our precomputed CLIP embeddings is available from our repo in `partnet_mobility_
    or run 
 
    ```bash
-   python articulate.py modality=text  prompt="suitcase with a retractable handle" out_dir=results/text/suitcase
+   python articulate.py modality=text  prompt="suitcase with a retractable handle" out_dir=results/text/suitcase joint_actor.targetted_affordance=false
    ```
 
 <h3 id="visual-articulation">🖼 / 🎥 Visual Articulation </h3>
