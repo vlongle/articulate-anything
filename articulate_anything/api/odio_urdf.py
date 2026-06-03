@@ -1110,6 +1110,14 @@ class Robot(NamedElement):
             parent_link_name = "base_helper"
 
         joint = self.get_joint_between(child_link_name, parent_link_name)
+        if joint is None:
+            # The child may already be parented to a DIFFERENT link (e.g. via
+            # place_relative_to). A link can have only one parent in the kinematic
+            # tree, so reuse/replace that joint instead of adding a second one
+            # (which produces an invalid "multiple parents" URDF).
+            existing_parent = self.get_parent_link_name(child_link_name)
+            if existing_parent is not None and existing_parent != parent_link_name:
+                joint = self.get_joint_between(child_link_name, existing_parent)
         if joint is not None and not force_overwrite:
             return  # Joint already exists
 
@@ -1168,6 +1176,14 @@ class Robot(NamedElement):
             parent_link_name = "base_helper"
 
         joint = self.get_joint_between(child_link_name, parent_link_name)
+        if joint is None:
+            # The child may already be parented to a DIFFERENT link (e.g. via
+            # place_relative_to). A link can have only one parent in the kinematic
+            # tree, so reuse/replace that joint instead of adding a second one
+            # (which produces an invalid "multiple parents" URDF).
+            existing_parent = self.get_parent_link_name(child_link_name)
+            if existing_parent is not None and existing_parent != parent_link_name:
+                joint = self.get_joint_between(child_link_name, existing_parent)
         if joint is not None and not force_overwrite:
             return  # Joint already exists
 

@@ -364,6 +364,14 @@ class JointPredictionActor(Agent):
             if joint_name:
                 videos = [v for v in videos if joint_name in v]
                 print("AFTER FILTER VIDEO", videos)
+            if not videos:
+                raise RuntimeError(
+                    "No rendered video (.mp4) was found in "
+                    f"'{self.cfg.out_dir}'. The SAPIEN simulation likely failed to "
+                    "produce a video (e.g. an invalid URDF such as a link with "
+                    "multiple parents, or a failed simulation step). Check the "
+                    "simulation logs above for the underlying error."
+                )
             video = videos[0]
             video = join_path(self.cfg.out_dir, video)
         # apply cotracker to the predicted video
